@@ -1,0 +1,187 @@
+import { profile } from './store.js';
+
+const S = {
+  // navigation
+  'nav.home': ['Domů', 'Home'],
+  'nav.reader': ['Kniha', 'Book'],
+  'nav.lesson': ['Lekce', 'Lesson'],
+  'nav.quiz': ['Testy', 'Tests'],
+  'nav.cards': ['Kartičky', 'Cards'],
+  'nav.notebook': ['Sešit', 'Notebook'],
+  'nav.settings': ['Nastavení', 'Settings'],
+  // common
+  'back': ['Zpět', 'Back'],
+  'next': ['Další', 'Next'],
+  'prev': ['Předchozí', 'Previous'],
+  'close': ['Zavřít', 'Close'],
+  'cancel': ['Zrušit', 'Cancel'],
+  'save': ['Uložit', 'Save'],
+  'delete': ['Smazat', 'Delete'],
+  'create': ['Vytvořit', 'Create'],
+  'yes': ['Ano', 'Yes'],
+  'no': ['Ne', 'No'],
+  'check': ['Zkontrolovat', 'Check'],
+  'continue': ['Pokračovat', 'Continue'],
+  'start': ['Začít', 'Start'],
+  'done': ['Hotovo', 'Done'],
+  'correct': ['Správně!', 'Correct!'],
+  'wrong': ['Tohle ještě ne.', 'Not quite.'],
+  'answer': ['Odpověď', 'Answer'],
+  'explanation': ['Vysvětlení', 'Explanation'],
+  'notes': ['Poznámky', 'Notes'],
+  'level': ['Úroveň', 'Level'],
+  'streak': ['dní v řadě', 'day streak'],
+  'page': ['Strana', 'Page'],
+  'of': ['z', 'of'],
+  // home
+  'home.morning': ['Dobré ráno', 'Good morning'],
+  'home.day': ['Dobrý den', 'Good afternoon'],
+  'home.evening': ['Dobrý večer', 'Good evening'],
+  'home.sub': ['Dnes je skvělý den na trochu matiky.', 'A great day for a bit of maths.'],
+  'home.continue': ['Pokračovat v lekci', 'Continue lesson'],
+  'home.openBook': ['Otevřít knihu', 'Open book'],
+  'home.contents': ['Obsah', 'Contents'],
+  'home.soon': ['Připravuji', 'Coming soon'],
+  'home.week': ['Tento týden', 'This week'],
+  'home.tiles.reader': ['Čti knihu, podtrhávej a piš si do ní poznámky perem.', 'Read the book, highlight and write in it with your pen.'],
+  'home.tiles.lesson': ['Teorie s animacemi, řešené příklady a rychlé otázky.', 'Theory with animations, worked examples and quick checks.'],
+  'home.tiles.quiz': ['Ověř si, co umíš. Chyby si zopakuješ zvlášť.', 'Test yourself. Revisit your mistakes separately.'],
+  'home.tiles.cards': ['Pojmy česky ↔ anglicky s chytrým opakováním.', 'Terms Czech ↔ English with spaced repetition.'],
+  'home.tiles.notebook': ['Papír na poznámky jako na iPadu – linky, čtverečky, graf.', 'Paper for notes like on an iPad – lined, grid, axes.'],
+  'home.steps': ['kroků', 'steps'],
+  'home.best': ['nejlepší', 'best'],
+  'home.toLearn': ['k opakování', 'to review'],
+  'home.notebooks': ['sešitů', 'notebooks'],
+  // lesson
+  'lesson.step': ['Krok', 'Step'],
+  'lesson.openBook': ['Číst v knize', 'Read in book'],
+  'lesson.scratch': ['Poznámky', 'Notes'],
+  'lesson.finish': ['Dokončit lekci', 'Finish lesson'],
+  'lesson.quickCheck': ['Rychlé ověření', 'Quick check'],
+  'lesson.example': ['Řešený příklad', 'Worked example'],
+  'lesson.nextStep': ['Další krok', 'Next step'],
+  'lesson.showAll': ['Ukázat vše', 'Show all'],
+  'lesson.definition': ['Definice', 'Definition'],
+  'lesson.tip': ['Tip', 'Tip'],
+  'lesson.warn': ['Pozor', 'Watch out'],
+  'lesson.lang': ['V angličtině', 'In Czech'],
+  'lesson.done': ['Lekce dokončena!', 'Lesson complete!'],
+  'lesson.contents': ['Obsah lekce', 'Lesson contents'],
+  // quiz
+  'quiz.title': ['Test', 'Test'],
+  'quiz.quick': ['Rychlý test', 'Quick test'],
+  'quiz.full': ['Celý test', 'Full test'],
+  'quiz.mistakes': ['Opravit chyby', 'Fix mistakes'],
+  'quiz.questions': ['otázek', 'questions'],
+  'quiz.question': ['Otázka', 'Question'],
+  'quiz.typeAnswer': ['Napiš odpověď…', 'Type your answer…'],
+  'quiz.scratch': ['Pomocný papír', 'Scratch paper'],
+  'quiz.result': ['Výsledek', 'Result'],
+  'quiz.again': ['Zkusit znovu', 'Try again'],
+  'quiz.review': ['Přehled odpovědí', 'Answer review'],
+  'quiz.history': ['Historie pokusů', 'Attempt history'],
+  'quiz.noMistakes': ['Žádné chyby k opravě. Paráda!', 'No mistakes to fix. Nice!'],
+  'quiz.true': ['Pravda', 'True'],
+  'quiz.false': ['Nepravda', 'False'],
+  'quiz.matchHint': ['Klepni na pojem vlevo a pak na jeho dvojici vpravo.', 'Tap a term on the left, then its pair on the right.'],
+  'quiz.great': ['Výborně!', 'Excellent!'],
+  'quiz.good': ['Dobrá práce!', 'Good job!'],
+  'quiz.keep': ['Ještě to procvič.', 'Keep practising.'],
+  // cards
+  'cards.title': ['Kartičky', 'Flashcards'],
+  'cards.know': ['Umím', 'I know it'],
+  'cards.dont': ['Ještě ne', 'Not yet'],
+  'cards.flip': ['Klepni pro otočení', 'Tap to flip'],
+  'cards.glossary': ['Slovníček', 'Glossary'],
+  'cards.study': ['Procvičovat', 'Study'],
+  'cards.dir.csen': ['CZ → EN', 'CZ → EN'],
+  'cards.dir.encs': ['EN → CZ', 'EN → CZ'],
+  'cards.finished': ['Pro dnešek hotovo!', 'All done for today!'],
+  'cards.search': ['Hledat pojem…', 'Search a term…'],
+  'cards.box': ['Krabička', 'Box'],
+  // notebook
+  'nb.title': ['Sešity', 'Notebooks'],
+  'nb.new': ['Nový sešit', 'New notebook'],
+  'nb.name': ['Název sešitu', 'Notebook name'],
+  'nb.paper': ['Papír', 'Paper'],
+  'nb.color': ['Barva desek', 'Cover colour'],
+  'nb.addPage': ['Přidat stránku', 'Add page'],
+  'nb.pages': ['stran', 'pages'],
+  'nb.export': ['Uložit jako obrázek', 'Save as image'],
+  'nb.deletePage': ['Smazat stránku', 'Delete page'],
+  'nb.deleteNb': ['Smazat sešit', 'Delete notebook'],
+  'nb.confirmDelete': ['Opravdu smazat? Tohle nejde vrátit.', 'Really delete? This cannot be undone.'],
+  'nb.lessonPads': ['Poznámky z lekcí', 'Lesson notes'],
+  'paper.blank': ['Čistý', 'Blank'],
+  'paper.lined': ['Linkovaný', 'Lined'],
+  'paper.grid': ['Čtverečkovaný', 'Grid'],
+  'paper.dots': ['Tečkovaný', 'Dotted'],
+  'paper.axes': ['Graf (osy)', 'Graph (axes)'],
+  // ink
+  'ink.hand': ['Ruka / čtení', 'Hand / read'],
+  'ink.pen': ['Pero', 'Pen'],
+  'ink.hl': ['Zvýrazňovač', 'Highlighter'],
+  'ink.eraser': ['Guma', 'Eraser'],
+  'ink.line': ['Pravítko', 'Ruler'],
+  'ink.undo': ['Zpět', 'Undo'],
+  'ink.redo': ['Znovu', 'Redo'],
+  'ink.clear': ['Vymazat stránku', 'Clear page'],
+  // reader
+  'reader.open': ['Otevřít PDF', 'Open PDF'],
+  'reader.sample': ['Ukázková kniha', 'Sample book'],
+  'reader.toc': ['Obsah', 'Contents'],
+  'reader.bookmarks': ['Záložky', 'Bookmarks'],
+  'reader.noBookmarks': ['Zatím žádné záložky. Klepni na stužku vpravo nahoře.', 'No bookmarks yet. Tap the ribbon in the top right.'],
+  'reader.noOutline': ['Tahle kniha nemá obsah.', 'This book has no outline.'],
+  'reader.loading': ['Otevírám knihu…', 'Opening the book…'],
+  'reader.drop': ['Pusť PDF sem', 'Drop the PDF here'],
+  'reader.setStart': ['Lekce 1.1 začíná na této straně', 'Lesson 1.1 starts on this page'],
+  'reader.zoom': ['Přiblížení', 'Zoom'],
+  'reader.tint': ['Barva papíru', 'Paper tint'],
+  'reader.useSample': ['Zpět na ukázkovou knihu', 'Back to the sample book'],
+  // settings
+  'set.title': ['Nastavení', 'Settings'],
+  'set.lang': ['Jazyk výuky', 'Learning language'],
+  'set.langHint': ['„Obojí" ukáže český text a pod ním anglický překlad.', '"Both" shows Czech text with the English translation below.'],
+  'set.theme': ['Vzhled', 'Appearance'],
+  'set.light': ['Papír', 'Paper'],
+  'set.dark': ['Noc', 'Night'],
+  'set.auto': ['Podle systému', 'System'],
+  'set.pen': ['Pero a dotyk', 'Pen & touch'],
+  'set.penOnly': ['Kreslit jen perem (prstem posouvat)', 'Draw with pen only (scroll with finger)'],
+  'set.penOnlyHint': ['Jakmile poprvé použiješ pero, zapne se to samo.', 'Turns on automatically the first time you use a pen.'],
+  'set.sounds': ['Zvuky', 'Sounds'],
+  'set.flipSound': ['Šustění stránek v knize', 'Page-turn sound in the book'],
+  'set.data': ['Data a zálohy', 'Data & backups'],
+  'set.export': ['Uložit zálohu', 'Save backup'],
+  'set.import': ['Načíst zálohu', 'Load backup'],
+  'set.reset': ['Smazat pokrok', 'Reset progress'],
+  'set.resetConfirm': ['Smaže XP, výsledky testů a stav lekcí. Poznámky a sešity zůstanou.', 'Deletes XP, test results and lesson progress. Notes and notebooks stay.'],
+  'set.storage': ['Využité místo', 'Storage used'],
+  'set.about': ['O aplikaci', 'About'],
+  'set.name': ['Jak ti mám říkat?', 'What should I call you?'],
+  'set.imported': ['Záloha načtena', 'Backup loaded'],
+  'set.saved': ['Záloha uložena', 'Backup saved'],
+};
+
+export function lang() { return profile.lang === 'en' ? 'en' : 'cs'; }
+
+export function t(key) {
+  const v = S[key];
+  if (!v) return key;
+  return lang() === 'en' ? v[1] : v[0];
+}
+
+// Localise a content value: string | {cs, en}
+export function L(v, which = lang()) {
+  if (v == null) return '';
+  if (typeof v === 'string' || typeof v === 'number') return String(v);
+  return v[which] ?? v.cs ?? v.en ?? '';
+}
+
+// Number formatting with Czech decimal comma
+export function num(x, digits = 2) {
+  if (!Number.isFinite(x)) return '—';
+  const r = Math.round(x * 10 ** digits) / 10 ** digits;
+  return r.toLocaleString(lang() === 'en' ? 'en-US' : 'cs-CZ', { maximumFractionDigits: digits }).replace('-', '−').replace(/\u00a0/g, ' ');
+}

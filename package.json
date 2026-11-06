@@ -1,0 +1,44 @@
+{
+  "name": "folio-math",
+  "productName": "Folio",
+  "version": "0.1.0",
+  "description": "Folio – interaktivní učebnice matematiky, čtečka knihy a sešit pro Windows (dotyk + pero).",
+  "main": "electron/main.js",
+  "private": true,
+  "author": "Folio",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64 --publish never",
+    "web": "npx --yes http-server app -p 8080 -c-1",
+    "sample-pdf": "node tools/build-sample-pdf.js"
+  },
+  "devDependencies": {
+    "electron": "44.9.3",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "cz.folio.mathbook",
+    "productName": "Folio",
+    "copyright": "Folio",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**", "app/**", "build/icon.png", "package.json"],
+    "asar": true,
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Folio",
+      "artifactName": "Folio-Setup-${version}.exe"
+    },
+    "portable": { "artifactName": "Folio-Portable-${version}.exe" }
+  }
+}

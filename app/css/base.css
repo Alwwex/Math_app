@@ -1,0 +1,226 @@
+/* ============ Design tokens ============ */
+:root {
+  --bg: #f3eee4;
+  --bg-2: #ebe4d6;
+  --surface: #fffdf8;
+  --surface-2: #f8f3ea;
+  --surface-3: #f1eadd;
+  --line: #e2d9c8;
+  --line-2: #d4c9b4;
+  --ink: #23262f;
+  --ink-2: #555a66;
+  --ink-3: #8a8f99;
+  --accent: #2f62d8;
+  --accent-2: #1f4bb3;
+  --accent-soft: #e2eafb;
+  --accent-ink: #ffffff;
+  --coral: #e8794a;
+  --coral-soft: #fbe6da;
+  --good: #23935f;
+  --good-soft: #dcf2e6;
+  --bad: #d4483f;
+  --bad-soft: #fbe1de;
+  --warn: #d9952b;
+  --warn-soft: #fbefd6;
+  --violet: #7a55d0;
+  --violet-soft: #ece4fb;
+  --teal: #13897f;
+  --teal-soft: #d8f0ed;
+  --hl: #ffe27a;
+  --paper: #fffdf7;
+  --paper-rule: #c9d8f0;
+  --paper-margin: #f2b8b0;
+  --shadow-1: 0 1px 2px rgba(60, 45, 20, .06), 0 2px 8px rgba(60, 45, 20, .06);
+  --shadow-2: 0 2px 6px rgba(60, 45, 20, .08), 0 12px 32px rgba(60, 45, 20, .10);
+  --shadow-3: 0 10px 30px rgba(40, 30, 10, .16), 0 30px 80px rgba(40, 30, 10, .18);
+  --radius-s: 10px;
+  --radius: 16px;
+  --radius-l: 24px;
+  --rail-w: 92px;
+  --font-ui: "Inter", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-book: "Literata", "Sitka Text", Georgia, "Cambria", serif;
+  --font-display: "Fraunces", "Sitka Heading", Georgia, serif;
+  --font-hand: "Caveat", "Segoe Print", cursive;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #14161b;
+  --bg-2: #0f1115;
+  --surface: #1d2027;
+  --surface-2: #232731;
+  --surface-3: #2a2f3a;
+  --line: #2f3440;
+  --line-2: #3b4150;
+  --ink: #eceef3;
+  --ink-2: #b2b7c3;
+  --ink-3: #7d8392;
+  --accent: #6d95f5;
+  --accent-2: #8fb0ff;
+  --accent-soft: #233157;
+  --accent-ink: #0d1424;
+  --coral: #f08c62;
+  --coral-soft: #44281d;
+  --good: #46c48a;
+  --good-soft: #193a2b;
+  --bad: #f06b62;
+  --bad-soft: #43201e;
+  --warn: #f0b552;
+  --warn-soft: #43341a;
+  --violet: #a68af0;
+  --violet-soft: #2e2547;
+  --teal: #3cc2b5;
+  --teal-soft: #173a37;
+  --hl: #8a7322;
+  --paper: #22252d;
+  --paper-rule: #344263;
+  --paper-margin: #6a3a37;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 8px rgba(0, 0, 0, .25);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, .35), 0 12px 32px rgba(0, 0, 0, .35);
+  --shadow-3: 0 10px 30px rgba(0, 0, 0, .45), 0 30px 80px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+
+/* ============ Reset ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.5 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img, svg, canvas { display: block; }
+a { color: var(--accent); }
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+p { margin: 0; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; border-radius: 8px; }
+::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+.selectable { user-select: text; -webkit-user-select: text; }
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ============ App shell ============ */
+.app {
+  display: grid;
+  grid-template-columns: var(--rail-w) 1fr;
+  height: 100dvh;
+  width: 100vw;
+}
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px;
+  background: var(--surface-2);
+  border-right: 1px solid var(--line);
+  z-index: 20;
+}
+.rail-logo {
+  display: grid; place-items: center;
+  width: 52px; height: 52px; margin-bottom: 14px;
+  border-radius: 16px;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-1);
+}
+.rail-logo svg { width: 32px; height: 32px; }
+.rail-item {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  width: 76px; padding: 10px 4px 8px;
+  border: 0; background: transparent; border-radius: 16px;
+  color: var(--ink-2);
+  font-size: 11.5px; font-weight: 550; letter-spacing: .01em;
+  text-decoration: none;
+  transition: background .2s, color .2s, transform .15s var(--ease);
+}
+.rail-item svg { width: 24px; height: 24px; }
+.rail-item:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
+.rail-item:active { transform: scale(.94); }
+.rail-item.active { color: var(--accent); background: var(--accent-soft); }
+.rail-item.active::before {
+  content: ""; position: absolute; left: -8px; top: 14px; bottom: 14px; width: 4px;
+  border-radius: 0 4px 4px 0; background: var(--accent);
+}
+.rail-spacer { flex: 1; }
+.rail-xp {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 11px; color: var(--ink-2); font-weight: 600; margin-bottom: 6px;
+}
+.rail-xp .flame { font-size: 20px; line-height: 1; }
+
+.view-host {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+.view {
+  position: absolute; inset: 0;
+  overflow-y: auto; overflow-x: hidden;
+  animation: view-in .45s var(--ease) both;
+}
+.view.no-scroll { overflow: hidden; }
+@keyframes view-in { from { opacity: 0; transform: translateY(14px) scale(.995); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 720px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .rail { order: 2; flex-direction: row; justify-content: space-around; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); overflow-x: auto; }
+  .rail-logo, .rail-spacer, .rail-xp { display: none; }
+  .rail-item { width: auto; min-width: 58px; padding: 6px 6px; font-size: 10.5px; }
+  .rail-item.active::before { display: none; }
+}
+
+/* ============ Typography helpers ============ */
+.display { font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em; }
+.hand { font-family: var(--font-hand); }
+.muted { color: var(--ink-2); }
+.subtle { color: var(--ink-3); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ============ Splash ============ */
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  background: var(--bg);
+  transition: opacity .5s var(--ease), visibility .5s;
+}
+.splash.gone { opacity: 0; visibility: hidden; }
+.splash-mark { display: flex; align-items: center; gap: 14px; color: var(--ink); font: 600 40px/1 var(--font-display); animation: splash-pop .9s var(--ease) both; }
+@keyframes splash-pop { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ============ Toasts & FX ============ */
+.toasts { position: fixed; z-index: 900; right: 22px; bottom: 22px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: none; }
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; border-radius: 14px;
+  background: var(--ink); color: var(--bg);
+  box-shadow: var(--shadow-2);
+  font-weight: 550; font-size: 15px;
+  animation: toast-in .45s var(--ease-spring) both;
+  pointer-events: auto;
+}
+.toast.out { animation: toast-out .3s var(--ease) both; }
+.toast .xp { color: #ffd166; font-weight: 800; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(10px) scale(.95); } }
+.fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 950; }
+
+.xp-fly {
+  position: fixed; z-index: 960; pointer-events: none;
+  font: 800 20px/1 var(--font-ui); color: var(--warn);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+}

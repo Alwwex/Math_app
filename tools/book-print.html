@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>Matematika – Kapitola 1</title>
+<link rel="stylesheet" href="../app/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../app/css/fonts.css">
+<link rel="stylesheet" href="../app/css/widgets.css">
+<style>
+  @page { size: 160mm 230mm; margin: 15mm 14mm 17mm;
+    @bottom-center { content: counter(page); font: 600 8pt "Inter", sans-serif; color: #9a9fa8; } }
+  @page cover { margin: 0; @bottom-center { content: none; } }
+  @page plain { @bottom-center { content: none; } }
+  :root { --accent: #2f62d8; --coral: #e8794a; --good: #23935f; --bad: #d4483f; --violet: #7a55d0; --warn: #d9952b; --ink: #23262f; --ink-2: #555a66; --ink-3: #8a8f99; --line: #e2d9c8; --line-2: #d4c9b4; --surface: #fff; --surface-2: #f8f5ef; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font: 10.4pt/1.55 "Literata", Georgia, serif; color: #23262f; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { position: relative; break-after: page; }
+  .cover { width: 160mm; height: 230mm; overflow: hidden; padding: 0; color: #fff; background: linear-gradient(150deg, #2a4a8f, #16264d); }
+  .cover svg.art { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cover .t { position: absolute; left: 16mm; right: 14mm; bottom: 26mm; }
+  .cover small { font: 600 8pt "Inter", sans-serif; letter-spacing: .2em; text-transform: uppercase; opacity: .75; }
+  .cover h1 { font: 600 34pt/1.05 "Fraunces", serif; margin: 4mm 0 2mm; }
+  .cover .ch { font: italic 400 15pt "Fraunces", serif; color: #ffc49f; }
+  .cover .pub { position: absolute; top: 14mm; left: 16mm; font: 700 9pt "Inter", sans-serif; letter-spacing: .14em; opacity: .85; }
+  h1.chapter { font: 600 26pt/1.1 "Fraunces", serif; margin: 0 0 6mm; }
+  .kicker { font: 700 7.5pt "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #8a8f99; }
+  .toc { margin-top: 6mm; }
+  .toc div { display: flex; justify-content: space-between; border-bottom: 1px dotted #c9c1b0; padding: 1.5mm 0; font-size: 10.5pt; }
+  .toc div.sub { padding-left: 6mm; font-size: 10pt; color: #555a66; }
+  .toc div.dim { color: #aaa; }
+  section.sec { break-before: page; }
+  h2.sec-title { font: 600 20pt/1.15 "Fraunces", serif; margin: 0 0 5mm; }
+  h2.sec-title span { color: #2f62d8; margin-right: 3mm; }
+  h3 { font: 600 13pt/1.25 "Fraunces", serif; margin: 7mm 0 2.5mm; break-after: avoid; }
+  h3 .n { color: #e8794a; margin-right: 2mm; }
+  p { margin: 0 0 2.6mm; text-align: justify; hyphens: auto; }
+  p.lead { font-size: 11.2pt; }
+  .box { border-radius: 3mm; padding: 3mm 4mm; margin: 3mm 0; break-inside: avoid; }
+  .def { background: #eef3fd; border: 1.2px solid #b9cbf3; }
+  .def .lab { font: 700 7pt "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #fff; background: #2f62d8; padding: .6mm 2mm; border-radius: 1.2mm; margin-right: 2mm; }
+  .def .ttl { font: 600 9.5pt "Inter", sans-serif; }
+  .note { background: #f6f1e6; font-size: 9.6pt; }
+  .note.warn { background: #fbefd6; }
+  .note.tip { background: #e2f3e9; }
+  .note.lang { background: #ece4fb; }
+  .note b.l { font: 700 7pt "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #555a66; display: block; margin-bottom: 1mm; }
+  .ex { border: 1.2px dashed #d4c9b4; border-radius: 3mm; padding: 3mm 4mm; margin: 3mm 0; break-inside: avoid; }
+  .ex .lab { font: 700 7pt "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #fff; background: #e8794a; padding: .6mm 2mm; border-radius: 1.2mm; margin-right: 2mm; }
+  .ex ol { margin: 2mm 0 0; padding-left: 5mm; }
+  .ex li { margin-bottom: 1.5mm; }
+  .ex .ans { margin-top: 2mm; padding: 2mm 3mm; background: #e2f3e9; border-radius: 2mm; }
+  ul.l { margin: 2mm 0 3mm; padding-left: 5mm; }
+  ul.l li { margin-bottom: 1.4mm; }
+  figure { margin: 3mm 0; break-inside: avoid; text-align: center; }
+  figure .plots { display: flex; gap: 4mm; justify-content: center; }
+  figure .plots > * { flex: 1; max-width: 62mm; }
+  figure svg.plot { width: 100%; height: auto; }
+  figcaption { font: italic 8.6pt "Literata", serif; color: #555a66; margin-top: 1.5mm; }
+  .plot .tl { font-size: 13px; }
+  .katex { font-size: 1.04em; }
+  .katex-display { margin: 2mm 0; }
+  .term { border: 0; }
+  .exercises ol { padding-left: 6mm; }
+  .exercises li { margin-bottom: 3mm; break-inside: avoid; }
+  .exercises .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 6mm; margin-top: 1mm; font-size: 9.6pt; }
+  .exercises figure { max-width: 60mm; margin: 2mm 0; }
+  .answers { font-size: 9.4pt; columns: 2; column-gap: 6mm; }
+  .answers div { break-inside: avoid; margin-bottom: 1.6mm; }
+  table.vt { border-collapse: collapse; margin: 2mm auto; font: 9pt "Inter", sans-serif; }
+  table.vt td, table.vt th { border: 1px solid #d4c9b4; padding: 1.2mm 2.6mm; text-align: center; }
+  .machine { display: flex; align-items: center; justify-content: center; gap: 4mm; font: 600 10pt "Inter", sans-serif; }
+  .machine .ball { width: 11mm; height: 11mm; border-radius: 50%; display: grid; place-items: center; color: #fff; background: #2f62d8; }
+  .machine .ball.o { background: #e8794a; }
+  .machine .box2 { padding: 4mm 6mm; border-radius: 4mm; background: #2c3a59; color: #fff; }
+  .machine .arr { color: #8a8f99; font-size: 14pt; }
+  .pnum { position: fixed; }
+</style>
+</head>
+<body>
+<div id="book"></div>
+<script src="../app/vendor/katex/katex.min.js"></script>
+<script type="module" src="book-print.js"></script>
+</body>
+</html>
