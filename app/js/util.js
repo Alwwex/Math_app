@@ -138,7 +138,7 @@ export function confetti({ x = innerWidth / 2, y = innerHeight / 3, count = 140,
   });
   let raf;
   const tick = () => {
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore();
     let alive = 0;
     for (const p of parts) {
       p.life++; p.vy += .28; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
@@ -150,7 +150,7 @@ export function confetti({ x = innerWidth / 2, y = innerHeight / 3, count = 140,
       if (p.shape) ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); else { ctx.beginPath(); ctx.arc(0, 0, p.r / 1.4, 0, 7); ctx.fill(); }
       ctx.restore();
     }
-    if (alive && parts[0].life < 200) raf = requestAnimationFrame(tick); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    if (alive && parts[0].life < 200) raf = requestAnimationFrame(tick); else { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); }
   };
   cancelAnimationFrame(raf);
   tick();
