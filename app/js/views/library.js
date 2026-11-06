@@ -17,7 +17,7 @@ export default {
         lang() !== 'en' ? h('div', { class: 'lib-en' }, book.title.en) : null,
         h('div', { class: 'muted' }, book.authors),
         h('div', { class: 'lib-stats' },
-          h('div', {}, h('b', {}, '31'), h('small', {}, t('nav.chapters'))),
+          h('div', {}, h('b', {}, '31'), h('small', {}, lang() === 'en' ? 'chapters' : 'kapitol')),
           h('div', {}, h('b', {}, String(chapters.reduce((a, c) => a + c.sections.length, 0))), h('small', {}, lang() === 'en' ? 'sections' : 'oddílů')),
           h('div', {}, h('b', {}, String(done)), h('small', {}, lang() === 'en' ? 'finished' : 'hotovo'))),
         h('div', { class: 'row' },

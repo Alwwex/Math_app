@@ -1,0 +1,62 @@
+import { D, lead, p, def, tip, warn, lang, phys, math, list, widget, example, check, mcq, num, tf, match, term, step } from '../kit.js';
+
+export default {
+  intro: D('Vektorová pole a operátory gradient, divergence a rotace – jazyk elektromagnetismu a proudění. A jak je zapsat ve válcových a sférických souřadnicích.',
+    'Vector fields and the operators grad, div and curl – the language of electromagnetism and fluid flow – plus their form in cylindrical and spherical coordinates.'),
+  steps: [
+    step('10.1–10.3', D('Derivace vektorů a prostorové křivky', 'Differentiating vectors and space curves'), 'tornado', [
+      lead('Vektor závislý na čase derivujeme po složkách: rychlost $\\mathbf v = \\dot{\\mathbf r}$, zrychlení $\\mathbf a = \\ddot{\\mathbf r}$. Pozor na pohyblivé bázové vektory v polárních souřadnicích.',
+        'A time-dependent vector is differentiated componentwise: velocity $\\mathbf v = \\dot{\\mathbf r}$, acceleration $\\mathbf a = \\ddot{\\mathbf r}$. Watch out for moving basis vectors in polar coordinates.'),
+      math('\\dfrac{d}{dt}(\\mathbf a\\cdot\\mathbf b) = \\dot{\\mathbf a}\\cdot\\mathbf b + \\mathbf a\\cdot\\dot{\\mathbf b},\\qquad \\dfrac{d}{dt}(\\mathbf a\\times\\mathbf b) = \\dot{\\mathbf a}\\times\\mathbf b + \\mathbf a\\times\\dot{\\mathbf b}'),
+      p('Křivku popisuje jednotková tečna $\\hat{\\mathbf t}$, **křivost** $\\kappa$ (jak rychle se stáčí) a **torze** $\\tau$ (jak rychle se vyklání z roviny) – Frenetovy–Serretovy vzorce.', 'A curve is described by its unit tangent $\\hat{\\mathbf t}$, **curvature** $\\kappa$ (how fast it turns) and **torsion** $\\tau$ (how fast it leaves the plane) – the Frenet–Serret formulae.'),
+      check(mcq(D('Když má vektor $\\mathbf a(t)$ stálou velikost, pak $\\dot{\\mathbf a}$ je…', 'If $\\mathbf a(t)$ has constant magnitude, then $\\dot{\\mathbf a}$ is…'), [D('kolmý na $\\mathbf a$', 'perpendicular to $\\mathbf a$'), D('rovnoběžný s $\\mathbf a$', 'parallel to $\\mathbf a$'), D('nulový', 'zero'), D('jednotkový', 'a unit vector')], 0, D('$\\frac{d}{dt}(\\mathbf a\\cdot\\mathbf a) = 2\\mathbf a\\cdot\\dot{\\mathbf a} = 0$.', '$\\frac{d}{dt}(\\mathbf a\\cdot\\mathbf a) = 2\\mathbf a\\cdot\\dot{\\mathbf a} = 0$.'))),
+    ]),
+    step('10.6–10.7', D('Gradient, divergence a rotace', 'Grad, div and curl'), 'tornado', [
+      lead('Operátor nabla $\\nabla = (\\partial_x, \\partial_y, \\partial_z)$ dává tři důležité operace:', 'The nabla operator $\\nabla = (\\partial_x, \\partial_y, \\partial_z)$ gives three key operations:'),
+      list(D('**gradient** $\\nabla\\phi$ – směr nejrychlejšího růstu skalárního pole,', '**gradient** $\\nabla\\phi$ – direction of steepest increase of a scalar field,'),
+        D('**divergence** $\\nabla\\cdot\\mathbf a$ – kolik pole z bodu „vytéká",', '**divergence** $\\nabla\\cdot\\mathbf a$ – how much the field flows out of a point,'),
+        D('**rotace** $\\nabla\\times\\mathbf a$ – jak moc pole kolem bodu „víří".', '**curl** $\\nabla\\times\\mathbf a$ – how much the field swirls around a point.')),
+      widget('field'),
+      phys('Maxwellovy rovnice: $\\nabla\\cdot\\mathbf E = \\rho/\\varepsilon_0$ (náboje jsou zdroje), $\\nabla\\cdot\\mathbf B = 0$ (magnetické monopóly nejsou), $\\nabla\\times\\mathbf E = -\\partial_t\\mathbf B$.', 'Maxwell: $\\nabla\\cdot\\mathbf E = \\rho/\\varepsilon_0$ (charges are sources), $\\nabla\\cdot\\mathbf B = 0$ (no monopoles), $\\nabla\\times\\mathbf E = -\\partial_t\\mathbf B$.'),
+      check(num(D('Divergence pole $\\mathbf a = (x, y, z)$?', 'Divergence of $\\mathbf a = (x, y, z)$?'), 3, D('$1 + 1 + 1 = 3$.', '$1 + 1 + 1 = 3$.'))),
+    ]),
+    step('10.8', D('Vzorce pro vektorové operátory', 'Vector operator formulae'), 'gem', [
+      lead('Dvě identity, které platí vždy a mají hluboký fyzikální význam:', 'Two identities that always hold and carry deep physical meaning:'),
+      math('\\nabla\\times(\\nabla\\phi) = \\mathbf 0,\\qquad \\nabla\\cdot(\\nabla\\times\\mathbf a) = 0'),
+      p('První říká, že gradientní pole je nevírové (proto existuje potenciál), druhá, že rotace nemá zdroje. **Laplaceův operátor** je $\\nabla^2\\phi = \\nabla\\cdot\\nabla\\phi$.', 'The first says gradient fields are irrotational (hence a potential exists), the second that a curl has no sources. The **Laplacian** is $\\nabla^2\\phi = \\nabla\\cdot\\nabla\\phi$.'),
+      math('\\nabla\\times(\\nabla\\times\\mathbf a) = \\nabla(\\nabla\\cdot\\mathbf a) - \\nabla^2\\mathbf a'),
+      tip('Z poslední identity a Maxwellových rovnic plyne vlnová rovnice pro světlo.', 'The last identity plus Maxwell’s equations gives the wave equation for light.'),
+      check(tf(D('Rotace gradientu je vždy nulová.', 'The curl of a gradient is always zero.'), true, D('Smíšené derivace se odečtou.', 'Mixed derivatives cancel.'))),
+    ]),
+    step('10.9–10.10', D('Válcové a sférické souřadnice', 'Cylindrical and spherical polars'), 'galaxy', [
+      lead('V křivočarých souřadnicích mají operátory jiný tvar, protože bázové vektory mění směr. Klíčem jsou **Lamého koeficienty** $h_i$.', 'In curvilinear coordinates the operators change form because basis vectors rotate. The key are the **scale factors** $h_i$.'),
+      math('\\text{sférické: } h_r = 1,\\ h_\\theta = r,\\ h_\\phi = r\\sin\\theta', '\\text{spherical: } h_r = 1,\\ h_\\theta = r,\\ h_\\phi = r\\sin\\theta'),
+      math('\\nabla^2\\Phi = \\dfrac{1}{r^2}\\dfrac{\\partial}{\\partial r}\\left(r^2\\dfrac{\\partial\\Phi}{\\partial r}\\right) + \\dfrac{1}{r^2\\sin\\theta}\\dfrac{\\partial}{\\partial\\theta}\\left(\\sin\\theta\\dfrac{\\partial\\Phi}{\\partial\\theta}\\right) + \\dfrac{1}{r^2\\sin^2\\theta}\\dfrac{\\partial^2\\Phi}{\\partial\\phi^2}'),
+      example(D('Coulombův potenciál', 'The Coulomb potential'), D('Ověř, že $\\Phi = 1/r$ splňuje $\\nabla^2\\Phi = 0$ pro $r \\ne 0$.', 'Check that $\\Phi = 1/r$ satisfies $\\nabla^2\\Phi = 0$ for $r \\ne 0$.'),
+        [D('Závisí jen na $r$: $r^2\\Phi\' = r^2\\cdot(-1/r^2) = -1$.', 'Only $r$-dependence: $r^2\\Phi\' = r^2\\cdot(-1/r^2) = -1$.'), D('Derivace konstanty je nula.', 'The derivative of a constant is zero.')], '$\\nabla^2(1/r) = 0$'),
+      check(mcq(D('Objemový element ve válcových souřadnicích je…', 'The volume element in cylindrical polars is…'), ['$\\rho\\,d\\rho\\,d\\phi\\,dz$', '$d\\rho\\,d\\phi\\,dz$', '$\\rho^2\\,d\\rho\\,d\\phi\\,dz$', '$\\sin\\phi\\,d\\rho\\,d\\phi\\,dz$'], 0, D('$h_\\rho h_\\phi h_z = 1\\cdot\\rho\\cdot1$.', '$h_\\rho h_\\phi h_z = 1\\cdot\\rho\\cdot1$.'))),
+    ]),
+  ],
+  quiz: [
+    mcq(D('$\\nabla(x^2 + y^2 + z^2) = ?$', '$\\nabla(x^2 + y^2 + z^2) = ?$'), ['$2\\mathbf r$', '$\\mathbf r$', '$2$', '$r^2$'], 0, D('$(2x, 2y, 2z)$.', '$(2x, 2y, 2z)$.')),
+    num(D('$\\nabla\\cdot(-y, x, 0) = ?$', '$\\nabla\\cdot(-y, x, 0) = ?$'), 0, D('Čistý vír nemá zdroje.', 'A pure vortex has no sources.')),
+    mcq(D('$\\nabla\\times(-y, x, 0) = ?$', '$\\nabla\\times(-y, x, 0) = ?$'), ['$(0, 0, 2)$', '$(0, 0, 0)$', '$(0, 0, 1)$', '$(2, 2, 0)$'], 0, D('$\\partial_x(x) - \\partial_y(-y) = 2$.', '$\\partial_x(x) - \\partial_y(-y) = 2$.')),
+    tf(D('Divergence rotace je vždy nulová.', 'The divergence of a curl is always zero.'), true, D('Identita $\\nabla\\cdot(\\nabla\\times\\mathbf a) = 0$.', 'Identity $\\nabla\\cdot(\\nabla\\times\\mathbf a) = 0$.')),
+    mcq(D('Gradient skalárního pole míří…', 'The gradient of a scalar field points…'), [D('ve směru nejrychlejšího růstu', 'in the direction of steepest increase'), D('podél vrstevnic', 'along contours'), D('ve směru poklesu', 'downhill'), D('náhodně', 'randomly')], 0, D('A je kolmý na vrstevnice.', 'And is perpendicular to contours.')),
+    mcq(D('Lamého koeficient $h_\\phi$ ve sférických souřadnicích je…', 'The scale factor $h_\\phi$ in spherical polars is…'), ['$r\\sin\\theta$', '$r$', '$1$', '$\\sin\\theta$'], 0, D('Kružnice rovnoběžky má poloměr $r\\sin\\theta$.', 'A circle of latitude has radius $r\\sin\\theta$.')),
+    num(D('$\\nabla^2(x^2 + y^2 + z^2) = ?$', '$\\nabla^2(x^2 + y^2 + z^2) = ?$'), 6, D('$2 + 2 + 2$.', '$2 + 2 + 2$.')),
+    match(D('Spoj operátor s významem.', 'Match each operator to its meaning.'), [['gradient', 'nejstrmější růst'], ['divergence', 'zdroje pole'], ['rotace', 'víření'], ['laplacián', 'div grad']], D('Viz krok 2 a 3.', 'See steps 2 and 3.')),
+  ],
+  glossary: [
+    term('vektorové pole', 'vector field', D('Vektor přiřazený každému bodu prostoru.', 'A vector at every point of space.'), '\\mathbf a(\\mathbf r)'),
+    term('gradient', 'gradient', D('$\\nabla\\phi$ – směr nejrychlejšího růstu.', '$\\nabla\\phi$ – direction of steepest increase.'), '\\nabla\\phi'),
+    term('divergence', 'divergence', D('$\\nabla\\cdot\\mathbf a$ – míra zdrojů.', '$\\nabla\\cdot\\mathbf a$ – source strength.'), ''),
+    term('rotace', 'curl', D('$\\nabla\\times\\mathbf a$ – míra víření.', '$\\nabla\\times\\mathbf a$ – swirl.'), ''),
+    term('Laplaceův operátor', 'Laplacian', D('$\\nabla^2 = \\nabla\\cdot\\nabla$.', '$\\nabla^2 = \\nabla\\cdot\\nabla$.'), '\\nabla^2'),
+    term('křivost', 'curvature', D('Jak rychle se křivka stáčí.', 'How fast a curve turns.'), '\\kappa'),
+    term('torze', 'torsion', D('Jak rychle křivka opouští rovinu.', 'How fast a curve leaves its plane.'), '\\tau'),
+    term('Lamého koeficienty', 'scale factors', D('Délkové faktory křivočarých souřadnic.', 'Length factors of curvilinear coordinates.'), 'h_i'),
+    term('nevírové pole', 'irrotational field', D('Pole s nulovou rotací.', 'A field with zero curl.'), ''),
+    term('solenoidální pole', 'solenoidal field', D('Pole s nulovou divergencí.', 'A field with zero divergence.'), ''),
+  ],
+};

@@ -1,0 +1,62 @@
+import { D, lead, p, def, tip, warn, lang, phys, math, list, widget, example, check, mcq, num, tf, match, term, step } from '../kit.js';
+
+export default {
+  intro: D('Vektory mají velikost i směr: síla, rychlost, pole. Kapitola probírá jejich sčítání, skalární a vektorový součin a jak s nimi popsat přímky, roviny a vzdálenosti.',
+    'Vectors have size and direction: force, velocity, fields. Addition, scalar and vector products, and how to describe lines, planes and distances.'),
+  steps: [
+    step('7.1–7.5', D('Vektory, složky a velikost', 'Vectors, components and magnitude'), 'compass', [
+      lead('Vektor zapíšeme ve složkách pomocí jednotkových vektorů: $\\mathbf a = a_x\\mathbf i + a_y\\mathbf j + a_z\\mathbf k$. Velikost je $|\\mathbf a| = \\sqrt{a_x^2 + a_y^2 + a_z^2}$.',
+        'Write a vector in components with unit vectors: $\\mathbf a = a_x\\mathbf i + a_y\\mathbf j + a_z\\mathbf k$. Its magnitude is $|\\mathbf a| = \\sqrt{a_x^2 + a_y^2 + a_z^2}$.'),
+      p('Sčítání je „hlava k patě" – rovnoběžníkové pravidlo. Sčítá se po složkách.', 'Addition is head-to-tail – the parallelogram rule. Components simply add.'),
+      widget('vectors', { mode: 'sum' }),
+      check(num(D('Velikost vektoru $(2, 3, 6)$?', 'Magnitude of $(2, 3, 6)$?'), 7, D('$\\sqrt{4 + 9 + 36} = 7$.', '$\\sqrt{4 + 9 + 36} = 7$.'))),
+    ]),
+    step('7.6', D('Skalární a vektorový součin', 'Scalar and vector products'), 'triangle_ruler', [
+      def(D('Skalární součin', 'Scalar product'), '$\\mathbf a\\cdot\\mathbf b = |\\mathbf a||\\mathbf b|\\cos\\theta = a_xb_x + a_yb_y + a_zb_z$. Je nulový pro kolmé vektory.', '$\\mathbf a\\cdot\\mathbf b = |\\mathbf a||\\mathbf b|\\cos\\theta = a_xb_x + a_yb_y + a_zb_z$. It vanishes for perpendicular vectors.'),
+      widget('vectors', { mode: 'dot' }),
+      def(D('Vektorový součin', 'Vector product'), '$\\mathbf a\\times\\mathbf b$ je kolmý na oba vektory, má velikost $|\\mathbf a||\\mathbf b|\\sin\\theta$ (plocha rovnoběžníku) a směr podle pravidla pravé ruky. Platí $\\mathbf a\\times\\mathbf b = -\\mathbf b\\times\\mathbf a$.',
+        '$\\mathbf a\\times\\mathbf b$ is perpendicular to both, has magnitude $|\\mathbf a||\\mathbf b|\\sin\\theta$ (parallelogram area) and direction by the right-hand rule. $\\mathbf a\\times\\mathbf b = -\\mathbf b\\times\\mathbf a$.'),
+      math('\\mathbf a\\times\\mathbf b = \\begin{vmatrix}\\mathbf i & \\mathbf j & \\mathbf k\\\\ a_x & a_y & a_z\\\\ b_x & b_y & b_z\\end{vmatrix}'),
+      p('**Smíšený součin** $[\\mathbf a, \\mathbf b, \\mathbf c] = \\mathbf a\\cdot(\\mathbf b\\times\\mathbf c)$ je objem rovnoběžnostěnu. **Dvojitý vektorový součin**: $\\mathbf a\\times(\\mathbf b\\times\\mathbf c) = (\\mathbf a\\cdot\\mathbf c)\\mathbf b - (\\mathbf a\\cdot\\mathbf b)\\mathbf c$.',
+        'The **scalar triple product** $[\\mathbf a, \\mathbf b, \\mathbf c] = \\mathbf a\\cdot(\\mathbf b\\times\\mathbf c)$ is the parallelepiped volume. **Vector triple product**: $\\mathbf a\\times(\\mathbf b\\times\\mathbf c) = (\\mathbf a\\cdot\\mathbf c)\\mathbf b - (\\mathbf a\\cdot\\mathbf b)\\mathbf c$.'),
+      widget('vectors', { mode: 'cross' }),
+      phys('Moment síly je $\\boldsymbol\\tau = \\mathbf r\\times\\mathbf F$, Lorentzova síla $\\mathbf F = q\\mathbf v\\times\\mathbf B$.', 'Torque is $\\boldsymbol\\tau = \\mathbf r\\times\\mathbf F$, the Lorentz force $\\mathbf F = q\\mathbf v\\times\\mathbf B$.'),
+      check(num(D('$(1, 2, 3)\\cdot(4, -5, 6) = ?$', '$(1, 2, 3)\\cdot(4, -5, 6) = ?$'), 12, D('$4 - 10 + 18 = 12$.', '$4 - 10 + 18 = 12$.'))),
+    ]),
+    step('7.7–7.8', D('Přímky, roviny a vzdálenosti', 'Lines, planes and distances'), 'straight_ruler', [
+      lead('Přímka: $\\mathbf r = \\mathbf a + \\lambda\\mathbf b$. Rovina s normálou $\\mathbf n$: $\\mathbf r\\cdot\\hat{\\mathbf n} = d$. Koule: $|\\mathbf r - \\mathbf c| = R$.', 'Line: $\\mathbf r = \\mathbf a + \\lambda\\mathbf b$. Plane with normal $\\mathbf n$: $\\mathbf r\\cdot\\hat{\\mathbf n} = d$. Sphere: $|\\mathbf r - \\mathbf c| = R$.'),
+      math('d_{\\text{bod–přímka}} = \\dfrac{|(\\mathbf p - \\mathbf a)\\times\\mathbf b|}{|\\mathbf b|},\\qquad d_{\\text{bod–rovina}} = |\\mathbf p\\cdot\\hat{\\mathbf n} - d|', 'd_{\\text{point–line}} = \\dfrac{|(\\mathbf p - \\mathbf a)\\times\\mathbf b|}{|\\mathbf b|},\\qquad d_{\\text{point–plane}} = |\\mathbf p\\cdot\\hat{\\mathbf n} - d|'),
+      example(D('Vzdálenost od roviny', 'Distance to a plane'), D('Jak daleko je bod $(1, 2, 3)$ od roviny $2x - y + 2z = 3$?', 'How far is $(1, 2, 3)$ from the plane $2x - y + 2z = 3$?'),
+        [D('$\\mathbf n = (2, -1, 2)$, $|\\mathbf n| = 3$.', '$\\mathbf n = (2, -1, 2)$, $|\\mathbf n| = 3$.'), D('$d = \\dfrac{|2 - 2 + 6 - 3|}{3} = 1$.', '$d = \\dfrac{|2 - 2 + 6 - 3|}{3} = 1$.')], '$1$'),
+      check(mcq(D('Normálový vektor roviny $x + 2y - z = 5$ je…', 'A normal to the plane $x + 2y - z = 5$ is…'), ['$(1, 2, -1)$', '$(1, 2, 5)$', '$(5, 0, 0)$', '$(-1, -2, -1)$'], 0, D('Koeficienty u $x, y, z$.', 'The coefficients of $x, y, z$.'))),
+    ]),
+    step('7.9', D('Reciproké vektory', 'Reciprocal vectors'), 'snowflake', [
+      lead('Ke třem nekomplanárním vektorům $\\mathbf a, \\mathbf b, \\mathbf c$ existuje „duální" trojice $\\mathbf a\', \\mathbf b\', \\mathbf c\'$ s vlastností $\\mathbf a\\cdot\\mathbf a\' = 1$, $\\mathbf a\\cdot\\mathbf b\' = 0$ atd.',
+        'For three non-coplanar vectors $\\mathbf a, \\mathbf b, \\mathbf c$ there is a dual triple $\\mathbf a\', \\mathbf b\', \\mathbf c\'$ with $\\mathbf a\\cdot\\mathbf a\' = 1$, $\\mathbf a\\cdot\\mathbf b\' = 0$, etc.'),
+      math('\\mathbf a\' = \\dfrac{\\mathbf b\\times\\mathbf c}{[\\mathbf a, \\mathbf b, \\mathbf c]}'),
+      phys('V krystalografii tvoří reciproké vektory **reciprokou mřížku** – právě v ní se popisuje rentgenová difrakce.', 'In crystallography the reciprocal vectors form the **reciprocal lattice** in which X-ray diffraction is described.'),
+      check(tf(D('Pro ortonormální bázi $\\mathbf i, \\mathbf j, \\mathbf k$ jsou reciproké vektory stejné.', 'For the orthonormal basis $\\mathbf i, \\mathbf j, \\mathbf k$ the reciprocal vectors are the same.'), true, D('$\\mathbf j\\times\\mathbf k = \\mathbf i$ a smíšený součin je 1.', '$\\mathbf j\\times\\mathbf k = \\mathbf i$ and the triple product is 1.'))),
+    ]),
+  ],
+  quiz: [
+    mcq(D('$\\mathbf i\\times\\mathbf j = ?$', '$\\mathbf i\\times\\mathbf j = ?$'), ['$\\mathbf k$', '$-\\mathbf k$', '$\\mathbf 0$', '$1$'], 0, D('Pravotočivá soustava.', 'Right-handed system.')),
+    num(D('Úhel (ve stupních) mezi $(1, 0, 0)$ a $(1, 1, 0)$?', 'Angle (degrees) between $(1, 0, 0)$ and $(1, 1, 0)$?'), 45, D('$\\cos\\theta = 1/\\sqrt2$.', '$\\cos\\theta = 1/\\sqrt2$.')),
+    num(D('Plocha rovnoběžníku z vektorů $(3, 0, 0)$ a $(0, 4, 0)$?', 'Area of the parallelogram spanned by $(3, 0, 0)$ and $(0, 4, 0)$?'), 12, D('$|\\mathbf a\\times\\mathbf b| = 12$.', '$|\\mathbf a\\times\\mathbf b| = 12$.')),
+    tf(D('Vektorový součin je komutativní.', 'The vector product is commutative.'), false, D('$\\mathbf a\\times\\mathbf b = -\\mathbf b\\times\\mathbf a$.', '$\\mathbf a\\times\\mathbf b = -\\mathbf b\\times\\mathbf a$.')),
+    num(D('Objem rovnoběžnostěnu z $\\mathbf i, \\mathbf j, 2\\mathbf k$?', 'Volume of the parallelepiped from $\\mathbf i, \\mathbf j, 2\\mathbf k$?'), 2, D('Smíšený součin $= 2$.', 'Triple product $= 2$.')),
+    mcq(D('$\\mathbf a\\times(\\mathbf b\\times\\mathbf c) = ?$', '$\\mathbf a\\times(\\mathbf b\\times\\mathbf c) = ?$'), ['$(\\mathbf a\\cdot\\mathbf c)\\mathbf b - (\\mathbf a\\cdot\\mathbf b)\\mathbf c$', '$(\\mathbf a\\cdot\\mathbf b)\\mathbf c - (\\mathbf a\\cdot\\mathbf c)\\mathbf b$', '$(\\mathbf a\\times\\mathbf b)\\times\\mathbf c$', '$\\mathbf 0$'], 0, D('Pravidlo „BAC − CAB".', 'The “BAC − CAB” rule.')),
+    num(D('Vzdálenost bodu $(0, 0, 5)$ od roviny $z = 2$?', 'Distance from $(0, 0, 5)$ to the plane $z = 2$?'), 3, D('$|5 - 2| = 3$.', '$|5 - 2| = 3$.')),
+    match(D('Spoj pojmy.', 'Match the terms.'), [['skalární součin', 'scalar product'], ['vektorový součin', 'vector product'], ['smíšený součin', 'triple product'], ['normála', 'normal']], D('Viz slovníček.', 'See glossary.')),
+  ],
+  glossary: [
+    term('vektor', 'vector', D('Veličina s velikostí a směrem.', 'A quantity with magnitude and direction.'), '\\mathbf a'),
+    term('skalár', 'scalar', D('Veličina daná jen číslem.', 'A quantity given by a number only.'), ''),
+    term('skalární součin', 'scalar product', D('$\\mathbf a\\cdot\\mathbf b = |a||b|\\cos\\theta$.', '$\\mathbf a\\cdot\\mathbf b = |a||b|\\cos\\theta$.'), ''),
+    term('vektorový součin', 'vector product', D('Vektor kolmý na oba, velikost = plocha rovnoběžníku.', 'Perpendicular vector, magnitude = parallelogram area.'), '\\mathbf a\\times\\mathbf b'),
+    term('smíšený součin', 'scalar triple product', D('Objem rovnoběžnostěnu.', 'Volume of a parallelepiped.'), '[\\mathbf a, \\mathbf b, \\mathbf c]'),
+    term('jednotkový vektor', 'unit vector', D('Vektor velikosti 1.', 'A vector of length 1.'), '\\hat{\\mathbf n}'),
+    term('normála', 'normal', D('Vektor kolmý k rovině.', 'A vector perpendicular to a plane.'), '\\mathbf n'),
+    term('báze', 'basis', D('Soubor vektorů, z nichž lze složit každý vektor.', 'Vectors from which every vector can be built.'), ''),
+    term('reciproké vektory', 'reciprocal vectors', D('Duální báze s $\\mathbf a\\cdot\\mathbf a\' = 1$.', 'Dual basis with $\\mathbf a\\cdot\\mathbf a\' = 1$.'), ''),
+  ],
+};

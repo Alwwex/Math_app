@@ -1,17 +1,20 @@
 {
   "name": "folio-math",
   "productName": "Folio",
-  "version": "0.1.0",
-  "description": "Folio – interaktivní učebnice matematiky, čtečka knihy a sešit pro Windows (dotyk + pero).",
+  "version": "2.0.0",
+  "description": "Folio – interaktivní učebnice k Mathematical Methods for Physics and Engineering: kniha, lekce, testy, kartičky a sešit (Windows, macOS, Linux, web).",
   "main": "electron/main.js",
   "private": true,
   "author": "Folio",
   "license": "UNLICENSED",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win --x64 --publish never",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --x64 --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never",
     "web": "npx --yes http-server app -p 8080 -c-1",
-    "sample-pdf": "node tools/build-sample-pdf.js"
+    "toc": "python3 tools/gen-toc.py"
   },
   "devDependencies": {
     "electron": "44.9.3",
@@ -21,13 +24,31 @@
     "appId": "cz.folio.mathbook",
     "productName": "Folio",
     "copyright": "Folio",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["electron/**", "app/**", "build/icon.png", "package.json"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**",
+      "app/**",
+      "build/icon.png",
+      "package.json"
+    ],
     "asar": true,
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "build/icon.ico"
     },
@@ -39,6 +60,34 @@
       "shortcutName": "Folio",
       "artifactName": "Folio-Setup-${version}.exe"
     },
-    "portable": { "artifactName": "Folio-Portable-${version}.exe" }
+    "portable": {
+      "artifactName": "Folio-Portable-${version}.exe"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.education",
+      "artifactName": "Folio-${version}-mac.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "Education",
+      "artifactName": "Folio-${version}-linux.${ext}"
+    }
   }
 }

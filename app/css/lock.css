@@ -73,3 +73,5 @@
 .ob-pinhost { position: relative; width: 100%; height: 470px; }
 .ob-pinhost .pin { position: absolute; }
 @media (max-width: 560px) { .ob-avatars { grid-template-columns: repeat(6, 1fr); } .lk-time { font-size: 76px; } .pin-keys { grid-template-columns: repeat(3, 72px); gap: 12px 20px; } .pin-key { width: 72px; height: 72px; } }
+.lk-power { position: absolute; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); backdrop-filter: blur(20px); color: #fff; display: grid; place-items: center; }
+.lk-power svg { width: 20px; height: 20px; }

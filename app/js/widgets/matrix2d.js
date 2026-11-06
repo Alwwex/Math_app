@@ -43,7 +43,7 @@ export default function matrix2d(el) {
     const e1 = tr(1, 0), e2 = tr(0, 1);
     for (const [v, c] of [[e1, 'var(--green)'], [e2, 'var(--red)']]) { s('line', { x1: plot.X(0), y1: plot.Y(0), x2: plot.X(v[0]), y2: plot.Y(v[1]), style: `stroke:${c};stroke-width:4;stroke-linecap:round` }, plot.gMain); const d = plot.dot(v[0], v[1], { r: 6 }); d.style.fill = c; }
     const E = eig(M);
-    if (E) for (const [, v] of E) { const L = Math.hypot(...v) || 1; s('line', { x1: plot.X(-6 * v[0] / L), y1: plot.Y(-6 * v[1] / L), x2: plot.X(6 * v[0] / L), y2: plot.Y(6 * v[1] / L), class: 'mx-eig' }, plot.gTop); }
+    if (E) for (const [, v] of E) { const L = Math.hypot(...v) || 1; s('line', { x1: plot.X(-6 * v[0] / L), y1: plot.Y(-6 * v[1] / L), x2: plot.X(6 * v[0] / L), y2: plot.Y(6 * v[1] / L), class: 'mx-eig' }, plot.gMain); }
     const detM = M[0] * M[3] - M[1] * M[2];
     info.innerHTML = `<div>${tex(`\\det A = ${f2(detM)}`)}</div><div class="muted small">${T('= kolikrát se zvětší plocha (žlutý čtverec). Záporné znaménko = převrácení orientace.', '= area scale factor (yellow square). Negative = orientation flipped.')}</div>` +
       (E ? `<div>${tex(`\\lambda_1 = ${f2(E[0][0])},\\quad \\lambda_2 = ${f2(E[1][0])}`)}</div><div class="muted small">${T('Fialové přímky = vlastní směry: vektory na nich se jen natáhnou λ-krát.', 'Purple lines = eigen-directions: vectors there are only stretched by λ.')}</div>` : `<div class="muted small">${T('Žádná reálná vlastní čísla – matice všechno otáčí.', 'No real eigenvalues – the matrix rotates everything.')}</div>`) +

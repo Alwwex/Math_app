@@ -68,6 +68,7 @@ export async function showLock(root, onDone) {
   const grid = h('div', { class: 'lk-users' });
   const panel = h('div', { class: 'lk-panel' }, h('div', { class: 'lk-q' }, T('Kdo se dnes učí?', 'Who is studying today?')), grid);
   shell.append(clk, panel);
+  if (window.folio?.quit) shell.append(h('button', { class: 'lk-power', title: 'Ukončit', html: icon('x'), onclick: () => window.folio.quit() }));
   const last = await store.get('global:lastUser');
   users.sort((a, b) => (b.id === last) - (a.id === last));
   users.forEach((u, i) => {

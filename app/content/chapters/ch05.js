@@ -1,0 +1,82 @@
+import { D, lead, p, def, tip, warn, lang, phys, math, list, widget, example, check, mcq, num, tf, match, term, step } from '../kit.js';
+
+export default {
+  intro: D('Ve fyzice závisí veličiny skoro vždy na víc proměnných – teplota na poloze a čase, tlak na objemu a teplotě. Parciální derivace měří změnu v jednom směru.',
+    'In physics quantities usually depend on several variables. Partial derivatives measure the change in one direction at a time.'),
+  steps: [
+    step('5.1–5.2', D('Parciální derivace a totální diferenciál', 'Partial derivatives and the total differential'), 'mountain', [
+      lead('$\\partial f/\\partial x$ je obyčejná derivace podle $x$, přičemž ostatní proměnné držíme jako konstanty.', '$\\partial f/\\partial x$ is the ordinary derivative with respect to $x$ while all other variables are held fixed.'),
+      math('df = \\dfrac{\\partial f}{\\partial x}dx + \\dfrac{\\partial f}{\\partial y}dy'),
+      widget('paramPlot', {
+        view: [-3, 3, -6, 9], params: [{ k: 'y', label: 'y_0', min: -2, max: 2, value: 1, step: .05 }, { k: 'a', label: 'x_0', min: -2.5, max: 2.5, value: 1, step: .05 }],
+        curves: [
+          { f: (x, P) => x * x - P.y * P.y + x * P.y, label: 'f(x, y_0) = x^2 - y_0^2 + xy_0' },
+          { f: (x, P) => (P.a * P.a - P.y * P.y + P.a * P.y) + (2 * P.a + P.y) * (x - P.a), label: '\\text{tečna}', color: 'var(--orange)', dash: true, thin: true },
+        ],
+        points: P => [{ x: P.a, y: P.a * P.a - P.y * P.y + P.a * P.y, color: 'var(--orange)' }],
+        info: (P, T) => `\\dfrac{\\partial f}{\\partial x} = 2x + y = ${(2 * P.a + P.y).toFixed(2)}\n\\text{${T('řez plochou při pevném', 'slice of the surface at fixed')}}\\ y_0`,
+      }),
+      tip('Smíšené derivace nezávisí na pořadí: $\\frac{\\partial^2 f}{\\partial x\\partial y} = \\frac{\\partial^2 f}{\\partial y\\partial x}$ (pro hladké funkce).', 'Mixed derivatives do not depend on order: $\\frac{\\partial^2 f}{\\partial x\\partial y} = \\frac{\\partial^2 f}{\\partial y\\partial x}$ (for smooth functions).'),
+      check(mcq(D('Pro $f = x^2 y^3$ je $\\partial f/\\partial y = $', 'For $f = x^2 y^3$, $\\partial f/\\partial y = $'), ['$3x^2y^2$', '$2xy^3$', '$6xy^2$', '$x^2y^3$'], 0, D('$x^2$ je konstanta, derivujeme $y^3$.', '$x^2$ is a constant; differentiate $y^3$.'))),
+    ]),
+    step('5.3', D('Úplné a neúplné diferenciály', 'Exact and inexact differentials'), 'puzzle', [
+      lead('Výraz $A\\,dx + B\\,dy$ je **úplný diferenciál** nějaké funkce $f$, právě když $\\partial A/\\partial y = \\partial B/\\partial x$.', 'The expression $A\\,dx + B\\,dy$ is an **exact differential** of some $f$ exactly when $\\partial A/\\partial y = \\partial B/\\partial x$.'),
+      example(D('Je to úplný diferenciál?', 'Is it exact?'), D('Rozhodni o $(2xy)\\,dx + (x^2 + 1)\\,dy$ a najdi $f$.', 'Decide for $(2xy)\\,dx + (x^2 + 1)\\,dy$ and find $f$.'),
+        [D('$\\partial A/\\partial y = 2x$, $\\partial B/\\partial x = 2x$ → úplný.', '$\\partial A/\\partial y = 2x$, $\\partial B/\\partial x = 2x$ → exact.'),
+         D('Z $\\partial f/\\partial x = 2xy$: $f = x^2y + g(y)$. Pak $\\partial f/\\partial y = x^2 + g\'(y) = x^2 + 1$ → $g = y$.', 'From $\\partial f/\\partial x = 2xy$: $f = x^2y + g(y)$. Then $\\partial f/\\partial y = x^2 + g\'(y) = x^2 + 1$ → $g = y$.')],
+        '$f = x^2y + y + C$'),
+      phys('V termodynamice je vnitřní energie $dU$ úplný diferenciál, ale teplo $\\delta Q$ a práce $\\delta W$ ne – záleží na cestě.', 'In thermodynamics $dU$ is exact, but heat $\\delta Q$ and work $\\delta W$ are not – they depend on the path.'),
+      check(tf(D('$y\\,dx - x\\,dy$ je úplný diferenciál.', '$y\\,dx - x\\,dy$ is an exact differential.'), false, D('$\\partial A/\\partial y = 1 \\ne -1 = \\partial B/\\partial x$.', '$\\partial A/\\partial y = 1 \\ne -1 = \\partial B/\\partial x$.'))),
+    ]),
+    step('5.4–5.6', D('Řetízkové pravidlo a záměna proměnných', 'Chain rule and change of variables'), 'link', [
+      lead('Když $x$ a $y$ samy závisí na $t$ (nebo na nových proměnných $u, v$), sčítáme příspěvky všech cest.', 'If $x$ and $y$ themselves depend on $t$ (or on new variables $u, v$), we add the contributions of all paths.'),
+      math('\\dfrac{df}{dt} = \\dfrac{\\partial f}{\\partial x}\\dfrac{dx}{dt} + \\dfrac{\\partial f}{\\partial y}\\dfrac{dy}{dt}'),
+      p('Pro tři proměnné vázané rovnicí $F(x, y, z) = 0$ platí elegantní **cyklický vztah**: $$\\left(\\frac{\\partial x}{\\partial y}\\right)_z\\left(\\frac{\\partial y}{\\partial z}\\right)_x\\left(\\frac{\\partial z}{\\partial x}\\right)_y = -1.$$',
+        'For three variables linked by $F(x, y, z) = 0$ there is the elegant **cyclic relation**: $$\\left(\\frac{\\partial x}{\\partial y}\\right)_z\\left(\\frac{\\partial y}{\\partial z}\\right)_x\\left(\\frac{\\partial z}{\\partial x}\\right)_y = -1.$$'),
+      warn('Pozor na minus – intuice „zkrátit zlomky" by dala $+1$, a to je špatně.', 'Watch the minus sign – the “cancel the fractions” intuition gives $+1$, which is wrong.'),
+      check(num(D('$f = x^2 + y^2$, $x = \\cos t$, $y = \\sin t$. Kolik je $df/dt$?', '$f = x^2 + y^2$, $x = \\cos t$, $y = \\sin t$. What is $df/dt$?'), 0, D('$f = 1$ pořád; řetízkově: $2x(-\\sin t) + 2y\\cos t = 0$.', '$f = 1$ always; via the chain rule: $2x(-\\sin t) + 2y\\cos t = 0$.'))),
+    ]),
+    step('5.7–5.8', D('Stacionární body funkcí dvou proměnných', 'Stationary points of two-variable functions'), 'mountain', [
+      lead('Stacionární bod má obě parciální derivace nulové. Jestli je to minimum, maximum nebo **sedlo**, rozhodne druhá derivace.', 'At a stationary point both partial derivatives vanish. Whether it is a minimum, maximum or **saddle** is decided by second derivatives.'),
+      def(D('Test druhých derivací', 'Second-derivative test'), 'Označ $D = f_{xx}f_{yy} - f_{xy}^2$. Pokud $D > 0$ a $f_{xx} > 0$ → minimum, $D > 0$ a $f_{xx} < 0$ → maximum, $D < 0$ → sedlový bod.',
+        'Let $D = f_{xx}f_{yy} - f_{xy}^2$. If $D > 0$ and $f_{xx} > 0$ → minimum, $D > 0$ and $f_{xx} < 0$ → maximum, $D < 0$ → saddle point.'),
+      example(D('Sedlo', 'A saddle'), D('Klasifikuj stacionární bod $f = x^2 - y^2$.', 'Classify the stationary point of $f = x^2 - y^2$.'),
+        [D('$f_x = 2x$, $f_y = -2y$ → bod $(0, 0)$.', '$f_x = 2x$, $f_y = -2y$ → point $(0, 0)$.'), D('$f_{xx} = 2$, $f_{yy} = -2$, $f_{xy} = 0$ → $D = -4 < 0$.', '$f_{xx} = 2$, $f_{yy} = -2$, $f_{xy} = 0$ → $D = -4 < 0$.')], D('sedlový bod', 'saddle point')),
+      check(mcq(D('$f = x^2 + xy + y^2$ má v počátku…', '$f = x^2 + xy + y^2$ has at the origin…'), [D('minimum', 'a minimum'), D('maximum', 'a maximum'), D('sedlo', 'a saddle'), D('nelze rozhodnout', 'cannot tell')], 0, D('$D = 2\\cdot2 - 1 = 3 > 0$, $f_{xx} > 0$.', '$D = 2\\cdot2 - 1 = 3 > 0$, $f_{xx} > 0$.'))),
+    ]),
+    step('5.9', D('Vázané extrémy – Lagrangeovy multiplikátory', 'Constrained extrema – Lagrange multipliers'), 'target', [
+      lead('Hledáme extrém $f(x, y)$, ale jen na křivce $g(x, y) = 0$. V optimu jsou gradienty $f$ a $g$ rovnoběžné.', 'We want an extremum of $f(x, y)$ only along the curve $g(x, y) = 0$. At the optimum the gradients of $f$ and $g$ are parallel.'),
+      math('\\nabla f = \\lambda\\,\\nabla g,\\qquad g(x, y) = 0'),
+      example(D('Největší obdélník', 'The biggest rectangle'), D('Maximalizuj $f = xy$ při $x + y = 10$.', 'Maximise $f = xy$ subject to $x + y = 10$.'),
+        [D('$\\nabla f = (y, x)$, $\\nabla g = (1, 1)$ → $y = \\lambda$, $x = \\lambda$.', '$\\nabla f = (y, x)$, $\\nabla g = (1, 1)$ → $y = \\lambda$, $x = \\lambda$.'), D('Tedy $x = y = 5$ a $f = 25$.', 'So $x = y = 5$ and $f = 25$.')], '$25$'),
+      phys('Stejný trik dává Boltzmannovo rozdělení ve statistické fyzice – maximalizujeme entropii při pevné energii.', 'The same trick gives the Boltzmann distribution – maximise entropy at fixed energy.'),
+      check(num(D('Minimum $x^2 + y^2$ na přímce $x + y = 2$?', 'Minimum of $x^2 + y^2$ on the line $x + y = 2$?'), 2, D('$x = y = 1$, hodnota $2$.', '$x = y = 1$, value $2$.'))),
+    ]),
+    step('5.12', D('Derivování integrálů', 'Differentiating integrals'), 'sparkles', [
+      lead('Když integrál závisí na parametru, můžeme derivovat „pod integrálem". Leibnizovo pravidlo přidá i členy za pohyblivé meze.', 'When an integral depends on a parameter we can differentiate under the integral sign. Leibniz’ rule adds terms for moving limits.'),
+      math('\\dfrac{d}{dt}\\int_{u(t)}^{v(t)} f(x, t)\\,dx = f(v, t)\\,v\' - f(u, t)\\,u\' + \\int_u^v \\dfrac{\\partial f}{\\partial t}dx'),
+      tip('Feynmanův trik: $\\int_0^\\infty e^{-tx}dx = 1/t$; derivací podle $t$ dostaneš $\\int_0^\\infty x e^{-tx}dx = 1/t^2$.', 'Feynman’s trick: $\\int_0^\\infty e^{-tx}dx = 1/t$; differentiate in $t$ to get $\\int_0^\\infty x e^{-tx}dx = 1/t^2$.'),
+      check(mcq(D('$\\dfrac{d}{dt}\\int_0^t x^2\\,dx = ?$', '$\\dfrac{d}{dt}\\int_0^t x^2\\,dx = ?$'), ['$t^2$', '$t^3/3$', '$2t$', '$0$'], 0, D('Horní mez: $f(t)\\cdot 1 = t^2$.', 'Upper limit: $f(t)\\cdot 1 = t^2$.'))),
+    ]),
+  ],
+  quiz: [
+    mcq(D('$\\partial^2 (x^3y^2)/\\partial x\\partial y = ?$', '$\\partial^2 (x^3y^2)/\\partial x\\partial y = ?$'), ['$6x^2y$', '$3x^2y^2$', '$2x^3y$', '$6xy$'], 0, D('$\\partial_y \\to 2x^3y$, pak $\\partial_x \\to 6x^2y$.', '$\\partial_y \\to 2x^3y$, then $\\partial_x \\to 6x^2y$.')),
+    tf(D('$(3x^2 + y)\\,dx + x\\,dy$ je úplný diferenciál.', '$(3x^2 + y)\\,dx + x\\,dy$ is exact.'), true, D('$\\partial A/\\partial y = 1 = \\partial B/\\partial x$; $f = x^3 + xy$.', '$\\partial A/\\partial y = 1 = \\partial B/\\partial x$; $f = x^3 + xy$.')),
+    num(D('Cyklický vztah: $(\\partial x/\\partial y)_z(\\partial y/\\partial z)_x(\\partial z/\\partial x)_y = ?$', 'Cyclic relation: $(\\partial x/\\partial y)_z(\\partial y/\\partial z)_x(\\partial z/\\partial x)_y = ?$'), -1, D('Vždy $-1$.', 'Always $-1$.')),
+    mcq(D('Když $D = f_{xx}f_{yy} - f_{xy}^2 < 0$, je stacionární bod…', 'If $D = f_{xx}f_{yy} - f_{xy}^2 < 0$ the stationary point is…'), [D('sedlo', 'a saddle'), D('minimum', 'a minimum'), D('maximum', 'a maximum'), D('inflexní', 'an inflection')], 0, D('Záporné $D$ = různé znaménko křivosti ve dvou směrech.', 'Negative $D$ = opposite curvature in two directions.')),
+    num(D('Maximum $xy$ při $2x + y = 8$?', 'Maximum of $xy$ subject to $2x + y = 8$?'), 8, D('$y = 2\\lambda$, $x = \\lambda$ → $4\\lambda = 8$, $x = 2$, $y = 4$, $xy = 8$.', '$y = 2\\lambda$, $x = \\lambda$ → $4\\lambda = 8$, $x = 2$, $y = 4$, $xy = 8$.')),
+    mcq(D('Totální diferenciál $f = x\\,y$ je…', 'The total differential of $f = x\\,y$ is…'), ['$y\\,dx + x\\,dy$', '$dx\\,dy$', '$x\\,dx + y\\,dy$', '$y\\,dx$'], 0, D('$f_x = y$, $f_y = x$.', '$f_x = y$, $f_y = x$.')),
+    mcq(D('Lagrangeova podmínka v optimu říká, že…', 'At a constrained optimum…'), [D('$\\nabla f$ je rovnoběžný s $\\nabla g$', '$\\nabla f$ is parallel to $\\nabla g$'), '$\\nabla f = 0$', '$\\nabla g = 0$', D('$f = g$', '$f = g$')], 0, D('$\\nabla f = \\lambda\\nabla g$.', '$\\nabla f = \\lambda\\nabla g$.')),
+    tf(D('Teplo $\\delta Q$ je v termodynamice úplný diferenciál.', 'Heat $\\delta Q$ is an exact differential in thermodynamics.'), false, D('Teplo závisí na cestě; úplný je např. $dU$ nebo $dS = \\delta Q/T$.', 'Heat depends on the path; $dU$ or $dS = \\delta Q/T$ are exact.')),
+  ],
+  glossary: [
+    term('parciální derivace', 'partial derivative', D('Derivace podle jedné proměnné, ostatní pevné.', 'Derivative in one variable with the others fixed.'), '\\partial f/\\partial x'),
+    term('totální diferenciál', 'total differential', D('$df = f_x dx + f_y dy$.', '$df = f_x dx + f_y dy$.'), ''),
+    term('úplný diferenciál', 'exact differential', D('Výraz, který je diferenciálem nějaké funkce.', 'An expression that is the differential of some function.'), ''),
+    term('sedlový bod', 'saddle point', D('Stacionární bod, který není extrém.', 'A stationary point that is not an extremum.'), ''),
+    term('Lagrangeův multiplikátor', 'Lagrange multiplier', D('Konstanta $\\lambda$ ve vazbě $\\nabla f = \\lambda\\nabla g$.', 'The constant $\\lambda$ in $\\nabla f = \\lambda\\nabla g$.'), '\\lambda'),
+    term('vazba', 'constraint', D('Podmínka, kterou musí proměnné splňovat.', 'A condition the variables must satisfy.'), 'g(x,y) = 0'),
+    term('obálka', 'envelope', D('Křivka tečná ke všem členům rodiny křivek.', 'A curve tangent to every member of a family of curves.'), ''),
+    term('smíšená derivace', 'mixed derivative', D('Derivace podle dvou různých proměnných.', 'A derivative with respect to two different variables.'), 'f_{xy}'),
+  ],
+};

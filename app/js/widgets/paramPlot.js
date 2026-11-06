@@ -61,7 +61,7 @@ export default function paramPlot(el, opts) {
       if (pt.color && pt.open) d.style.stroke = colorVar(pt.color);
     }
     if (opts.extra) opts.extra(plot, P, s);
-    info.innerHTML = opts.info ? opts.info(P, T).split('\n').map(line => `<div>${line.startsWith('$') || line.includes('<') ? line : tex(line)}</div>`).join('') : '';
+    info.innerHTML = opts.info ? opts.info(P, T).split('\n').map(line => `<div>${line.trim().startsWith('<') ? line : tex(line)}</div>`).join('') : '';
     info.style.display = opts.info ? '' : 'none';
   }
   const pp = (opts.params || []).find(p => p.k === opts.play);

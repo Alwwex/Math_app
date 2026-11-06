@@ -10,7 +10,7 @@ export default function brachistochrone(el) {
   const Bx = Math.PI, By = 2;
   const g = 9.81;
   // paths as arrays of points (x right, y down)
-  const N = 400;
+  const N = 2000;
   const cyc = Array.from({ length: N + 1 }, (_, i) => { const th = Math.PI * i / N; return [th - Math.sin(th), 1 - Math.cos(th)]; });
   const line = Array.from({ length: N + 1 }, (_, i) => [Bx * i / N, By * i / N]);
   // circular arc through A and B bulging down: centre (cx, cy) with A,B on circle, choose a quarter-ish circle
@@ -27,8 +27,9 @@ export default function brachistochrone(el) {
     p.t = [0]; let tt = 0;
     for (let i = 1; i < p.pts.length; i++) {
       const [x0, y0] = p.pts[i - 1], [x1, y1] = p.pts[i];
-      const ds = Math.hypot(x1 - x0, y1 - y0), yy = (y0 + y1) / 2;
-      tt += ds / Math.sqrt(2 * g * Math.max(yy, 1e-4));
+      // exact time on a straight segment with speed sqrt(2 g y): t = ds/dy · 2(√y1 − √y0)/√(2g)
+      const ds = Math.hypot(x1 - x0, y1 - y0), dy = y1 - y0;
+      tt += Math.abs(dy) > 1e-12 ? ds / dy * 2 * (Math.sqrt(y1) - Math.sqrt(y0)) / Math.sqrt(2 * g) : ds / Math.sqrt(2 * g * Math.max(y0, 1e-9));
       p.t.push(tt);
     }
     p.total = tt;
@@ -51,7 +52,7 @@ export default function brachistochrone(el) {
   }
   function results(tt) {
     board.innerHTML = '';
-    [...paths].sort((a, b) => a.total - b.total).forEach((p, i) => board.append(h('div', { class: 'br-row' + (tt >= p.total ? ' done' : '') }, h('i', { style: { background: p.color } }), h('span', {}, `${i + 1}. ${p.name}`), h('b', {}, tt >= p.total ? `${num(p.total, 2)} s` : '…'))));
+    [...paths].sort((a, b) => a.total - b.total).forEach((p, i) => board.append(h('div', { class: 'br-row' + (tt >= p.total ? ' done' : '') }, h('i', { style: { background: p.color } }), h('span', {}, `${i + 1}. ${p.name}`), h('b', {}, tt >= p.total ? `${num(p.total, 3)} s` : '…'))));
   }
   go.onclick = () => {
     cancelAnimationFrame(raf);

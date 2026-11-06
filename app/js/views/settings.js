@@ -52,7 +52,8 @@ export default {
     inner.append(group(E('Jazyk a vzhled', 'Language & appearance'),
       cell('globe', '#007aff', t('set.lang'), seg([['cs', 'CZ'], ['en', 'EN'], ['both', 'CZ+EN']], profile.lang, v => { profile.lang = v; saveProfile(); applyTheme(); rerender(); }), t('set.langHint')),
       cell('moon', '#1c1c1e', t('set.theme'), seg([['light', t('set.light')], ['dark', t('set.dark')], ['auto', t('set.auto')]], profile.theme, v => { profile.theme = v; saveProfile(); applyTheme(); rerender(); })),
-      window.folio ? cell('fullscreen', '#30b0c7', t('set.fullscreen'), toggle(true, () => window.folio.toggleFullscreen()), 'F11') : null));
+      window.folio ? cell('fullscreen', '#30b0c7', t('set.fullscreen'), toggle(window.folio.isFullscreen(), () => window.folio.toggleFullscreen()), 'F11') : null,
+      window.folio ? h('button', { class: 'cell', onclick: () => window.folio.quit() }, h('div', { class: 'ic-box', style: { background: '#8e8e93' }, html: icon('x') }), h('div', { class: 'lines' }, h('b', {}, E('Ukončit aplikaci', 'Quit the app')), h('small', {}, 'Ctrl+Q · Alt+F4')), h('span', { class: 'chev', html: icon('right') })) : null));
 
     inner.append(group(E('Pero a zvuk', 'Pen & sound'),
       cell('pen', '#ff2d55', t('set.penOnly'), toggle(profile.penOnly, v => { profile.penOnly = v; saveProfile(); }), t('set.penOnlyHint')),
