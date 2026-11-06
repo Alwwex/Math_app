@@ -1,0 +1,20 @@
+// Pomocné funkce pro zápis obsahu lekcí (dvojjazyčně: cs, en).
+export const D = (cs, en) => ({ cs, en: en ?? cs });
+export const lead = (cs, en) => ({ t: 'lead', cs, en });
+export const p = (cs, en) => ({ t: 'p', cs, en });
+export const def = (title, cs, en) => ({ t: 'def', title, cs, en });
+export const tip = (cs, en) => ({ t: 'note', kind: 'tip', cs, en });
+export const warn = (cs, en) => ({ t: 'note', kind: 'warn', cs, en });
+export const lang = (cs, en) => ({ t: 'note', kind: 'lang', cs, en });
+export const phys = (cs, en) => ({ t: 'note', kind: 'phys', cs, en });
+export const math = (tex, texEn) => ({ t: 'math', tex, texEn });
+export const list = (...items) => ({ t: 'list', items });
+export const widget = (name, opts = {}) => ({ t: 'widget', name, opts });
+export const example = (title, task, steps, answer) => ({ t: 'example', title, task, steps, answer });
+export const check = q => ({ t: 'check', q });
+export const mcq = (q, options, answer, explain, extra = {}) => ({ type: 'mcq', q, options, answer, explain, ...extra });
+export const num = (q, answer, explain, extra = {}) => ({ type: 'num', q, answer, explain, ...extra });
+export const tf = (q, answer, explain, extra = {}) => ({ type: 'tf', q, answer, explain, ...extra });
+export const match = (q, pairs, explain) => ({ type: 'match', q, pairs, explain });
+export const term = (cs, en, def, ex = '') => ({ id: cs, cs, en, def, ex });
+export const step = (sec, title, emoji, blocks) => ({ id: 's' + String(sec).replace(/[^\w]/g, '_'), sec: String(sec), title, emoji, blocks });

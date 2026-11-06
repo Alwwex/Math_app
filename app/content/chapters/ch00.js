@@ -1,4 +1,4 @@
-// Kapitola 1, část 1: Funkce a jejich grafy / Functions and Their Graphs
+// Rozcvička (kapitola 0): Funkce a jejich grafy / Warm-up: Functions and their graphs
 // Obsah je dvojjazyčný: { cs, en }. Matematika v $…$ (KaTeX).
 
 const D = (cs, en) => ({ cs, en });
@@ -35,7 +35,7 @@ export const steps = [
   {
     id: 'co-je-funkce',
     title: D('Co je funkce?', 'What is a function?'),
-    icon: '⚙️',
+    emoji: 'gear',
     blocks: [
       { t: 'lead', ...D(
         'Funkce je **pravidlo**, které každému vstupu přiřadí **právě jeden** výstup. Představ si ji jako stroj: vhodíš do něj číslo, stroj ho zpracuje podle svého předpisu a vypadne jiné číslo.',
@@ -68,7 +68,7 @@ export const steps = [
   {
     id: 'obor',
     title: D('Definiční obor a obor hodnot', 'Domain and range'),
-    icon: '🎯',
+    emoji: 'target',
     blocks: [
       { t: 'lead', ...D(
         '[[definiční obor|Definiční obor]] $D(f)$ jsou všechny vstupy, které do funkce smíme dát. [[obor hodnot|Obor hodnot]] $H(f)$ jsou všechny výstupy, které z ní opravdu mohou vypadnout.',
@@ -102,7 +102,7 @@ export const steps = [
   {
     id: 'ctyri-zpusoby',
     title: D('Čtyři způsoby, jak zapsat funkci', 'Four ways to represent a function'),
-    icon: '🧩',
+    emoji: 'puzzle',
     blocks: [
       { t: 'lead', ...D(
         'Jednu a tutéž funkci můžeš popsat **slovy**, **tabulkou**, **grafem** nebo **vzorcem**. Každý zápis se hodí na něco jiného – a dobrý matematik mezi nimi umí přepínat.',
@@ -128,7 +128,7 @@ export const steps = [
   {
     id: 'graf',
     title: D('Graf funkce', 'The graph of a function'),
-    icon: '📈',
+    emoji: 'chart',
     blocks: [
       { t: 'def', title: D('Graf funkce', 'Graph of a function'), ...D(
         '[[graf funkce|Graf funkce]] $f$ je množina všech bodů $[x, f(x)]$ v rovině, kde $x \\in D(f)$.',
@@ -150,7 +150,7 @@ export const steps = [
   {
     id: 'svisla-primka',
     title: D('Test svislou přímkou', 'The vertical line test'),
-    icon: '📏',
+    emoji: 'straight_ruler',
     blocks: [
       { t: 'lead', ...D(
         'Jak poznat z obrázku, jestli křivka je graf funkce? Stačí jedno pravítko postavené **svisle**.',
@@ -170,7 +170,7 @@ export const steps = [
   {
     id: 'po-castech',
     title: D('Funkce definované po částech', 'Piecewise defined functions'),
-    icon: '🧱',
+    emoji: 'package',
     blocks: [
       { t: 'lead', ...D(
         'Některé funkce mají **různé předpisy na různých částech** definičního oboru. Takovou funkci zapisujeme se složenou závorkou.',
@@ -202,7 +202,7 @@ export const steps = [
   {
     id: 'symetrie',
     title: D('Sudé a liché funkce', 'Symmetry: even and odd functions'),
-    icon: '🦋',
+    emoji: 'butterfly',
     blocks: [
       { t: 'lead', ...D(
         'Některé grafy jsou krásně [[souměrnost|souměrné]]. Tahle souměrnost se dá poznat i bez obrázku – jen dosazením $-x$.',
@@ -231,7 +231,7 @@ export const steps = [
   {
     id: 'monotonie',
     title: D('Rostoucí a klesající funkce', 'Increasing and decreasing functions'),
-    icon: '🎢',
+    emoji: 'coaster',
     blocks: [
       { t: 'lead', ...D(
         'Čti graf **zleva doprava**, jako text v knize. Když jde nahoru, funkce **roste**. Když jde dolů, funkce **klesá**.',
@@ -252,17 +252,17 @@ export const steps = [
   {
     id: 'shrnuti',
     title: D('Shrnutí', 'Summary'),
-    icon: '⭐',
+    emoji: 'star',
     blocks: [
       { t: 'lead', ...D('Skvělá práce! Tohle si z části 1.1 odnes:', 'Great work! Here is what to take away from section 1.1:') },
       { t: 'summary', items: [
-        { icon: '⚙️', ...D('**Funkce** přiřadí každému vstupu právě jeden výstup: $x \\mapsto f(x)$.', 'A **function** assigns exactly one output to each input: $x \\mapsto f(x)$.') },
-        { icon: '🎯', ...D('**$D(f)$** = povolené vstupy. Pozor na dělení nulou a odmocninu ze záporného čísla. **$H(f)$** = všechny výstupy.', '**Domain** = allowed inputs. Watch for division by zero and roots of negatives. **Range** = all outputs.') },
-        { icon: '🧩', ...D('Funkci zapíšeš slovy, tabulkou, grafem nebo vzorcem.', 'A function can be given in words, by a table, a graph or a formula.') },
-        { icon: '📏', ...D('**Test svislou přímkou**: žádná svislá přímka nesmí graf protnout dvakrát.', '**Vertical line test**: no vertical line may cross the graph twice.') },
-        { icon: '🧱', ...D('U funkce **po částech** nejdřív urči část, pak dosaď. $|x|$ je po částech.', 'For a **piecewise** function, first pick the piece, then plug in. $|x|$ is piecewise.') },
-        { icon: '🦋', ...D('**Sudá**: $f(-x) = f(x)$ (zrcadlo podle osy $y$). **Lichá**: $f(-x) = -f(x)$ (otočení kolem počátku).', '**Even**: $f(-x) = f(x)$ (mirror in the $y$-axis). **Odd**: $f(-x) = -f(x)$ (rotation about the origin).') },
-        { icon: '🎢', ...D('**Rostoucí**: graf zleva doprava stoupá. **Klesající**: klesá. Vždy na nějakém intervalu.', '**Increasing**: the graph rises left to right. **Decreasing**: it falls. Always on some interval.') },
+        { emoji: 'gear', ...D('**Funkce** přiřadí každému vstupu právě jeden výstup: $x \\mapsto f(x)$.', 'A **function** assigns exactly one output to each input: $x \\mapsto f(x)$.') },
+        { emoji: 'target', ...D('**$D(f)$** = povolené vstupy. Pozor na dělení nulou a odmocninu ze záporného čísla. **$H(f)$** = všechny výstupy.', '**Domain** = allowed inputs. Watch for division by zero and roots of negatives. **Range** = all outputs.') },
+        { emoji: 'puzzle', ...D('Funkci zapíšeš slovy, tabulkou, grafem nebo vzorcem.', 'A function can be given in words, by a table, a graph or a formula.') },
+        { emoji: 'straight_ruler', ...D('**Test svislou přímkou**: žádná svislá přímka nesmí graf protnout dvakrát.', '**Vertical line test**: no vertical line may cross the graph twice.') },
+        { emoji: 'package', ...D('U funkce **po částech** nejdřív urči část, pak dosaď. $|x|$ je po částech.', 'For a **piecewise** function, first pick the piece, then plug in. $|x|$ is piecewise.') },
+        { emoji: 'butterfly', ...D('**Sudá**: $f(-x) = f(x)$ (zrcadlo podle osy $y$). **Lichá**: $f(-x) = -f(x)$ (otočení kolem počátku).', '**Even**: $f(-x) = f(x)$ (mirror in the $y$-axis). **Odd**: $f(-x) = -f(x)$ (rotation about the origin).') },
+        { emoji: 'coaster', ...D('**Rostoucí**: graf zleva doprava stoupá. **Klesající**: klesá. Vždy na nějakém intervalu.', '**Increasing**: the graph rises left to right. **Decreasing**: it falls. Always on some interval.') },
       ] },
       { t: 'cta' },
     ],
@@ -331,10 +331,9 @@ export const quiz = [
 ];
 
 export default {
-  id: '1-1',
-  number: '1.1',
-  chapter: 1,
-  title: D('Funkce a jejich grafy', 'Functions and Their Graphs'),
+  n: 0,
+  title: D('Rozcvička: funkce a grafy', 'Warm-up: functions and graphs'),
   blurb: D('Co je funkce, definiční obor, grafy, test svislou přímkou, funkce po částech, souměrnost a monotonie.', 'What a function is, domain and range, graphs, the vertical line test, piecewise functions, symmetry and monotonicity.'),
+  intro: D('Než se pustíš do knihy, osvěž si, co je funkce, definiční obor, graf, souměrnost a monotonie. Je to rychlý start s nejvíce animacemi.', 'Before starting the book, refresh what a function, domain, graph, symmetry and monotonicity are. A quick start with lots of animations.'),
   steps, quiz, glossary,
 };

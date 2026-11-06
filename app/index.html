@@ -4,40 +4,37 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Folio – matematický sešit</title>
-  <meta name="description" content="Interaktivní učebnice, čtečka a sešit pro matematiku.">
-  <meta name="theme-color" content="#f3eee4">
+  <title>Folio</title>
+  <meta name="description" content="Folio – interaktivní učebnice, čtečka knihy a sešit.">
+  <meta name="theme-color" content="#f2f2f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/lock.css">
   <link rel="stylesheet" href="css/home.css">
   <link rel="stylesheet" href="css/reader.css">
   <link rel="stylesheet" href="css/lesson.css">
   <link rel="stylesheet" href="css/widgets.css">
+  <link rel="stylesheet" href="css/widgets2.css">
   <link rel="stylesheet" href="css/quiz.css">
   <link rel="stylesheet" href="css/notebook.css">
   <link rel="stylesheet" href="css/cards.css">
 </head>
 <body>
-  <div id="app" class="app">
-    <nav class="rail" id="rail" aria-label="Hlavní navigace"></nav>
+  <div id="app" class="app locked">
+    <nav class="side" id="side" aria-label="Navigace"></nav>
     <main class="view-host" id="view"></main>
+    <nav class="tabbar" id="tabbar" aria-label="Navigace"></nav>
   </div>
   <div id="toasts" class="toasts" aria-live="polite"></div>
   <canvas id="fx" class="fx-canvas" aria-hidden="true"></canvas>
-  <div id="splash" class="splash">
-    <div class="splash-mark">
-      <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
-        <path d="M10 14c8-4 16-4 22 1v38c-6-5-14-5-22-1z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M54 14c-8-4-16-4-22 1v38c6-5 14-5 22-1z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M37 40c4-10 8-14 13-15" fill="none" stroke="#e8794a" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-      <span>Folio</span>
-    </div>
-  </div>
+  <div id="splash" class="splash"><div class="splash-mark"><img src="assets/icon-512.png" alt=""><span>Folio</span></div></div>
   <script src="vendor/katex/katex.min.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>

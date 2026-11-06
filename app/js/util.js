@@ -20,6 +20,9 @@ export function h(tag, attrs = {}, ...kids) {
   return el;
 }
 export const $ = (sel, root = document) => root.querySelector(sel);
+// 3D emoji image (Fluent Emoji, MIT) – looks the same on every platform
+export const emo = (name, cls = '') => `<img class="emo ${cls}" src="emoji/${name}.png" alt="" draggable="false">`;
+export function emoEl(name, cls = '') { const i = document.createElement('img'); i.className = 'emo ' + cls; i.src = `emoji/${name}.png`; i.alt = ''; i.draggable = false; return i; }
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
@@ -125,7 +128,7 @@ export function confetti({ x = innerWidth / 2, y = innerHeight / 3, count = 140,
   const dpr = devicePixelRatio || 1;
   c.width = innerWidth * dpr; c.height = innerHeight * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const colors = ['#2f62d8', '#e8794a', '#23935f', '#ffd166', '#7a55d0', '#13897f', '#d4483f'];
+  const colors = ['#007aff', '#ff9500', '#34c759', '#ffcc00', '#af52de', '#30b0c7', '#ff2d55', '#5856d6'];
   const parts = Array.from({ length: count }, () => {
     const a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * spread;
     const v = 6 + Math.random() * 9;

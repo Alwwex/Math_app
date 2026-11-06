@@ -6,7 +6,10 @@ import { t, lang } from '../i18n.js';
 import { h, clamp, pickFile, toast, sound, sleep } from '../util.js';
 import { icon } from '../icons.js';
 import { InkSurface, InkToolbar, inkState, drawStrokes, onInk } from '../ink.js';
-import { book as bookMeta } from '../../content/book.js';
+import { book as bookMeta, chapters as bookChapters, locate, loadChapter } from '../../content/book.js';
+import { L } from '../i18n.js';
+import { rerender } from '../main.js';
+import { emo } from '../util.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('../../vendor/pdfjs/pdf.worker.min.js', import.meta.url).href;
 
@@ -17,9 +20,7 @@ function hashStr(s) { let x = 2166136261; for (let i = 0; i < s.length; i++) { x
 async function loadBookSource() {
   const user = await store.get('book:user');
   if (user?.data) return { id: 'u-' + hashStr(user.name + user.size), name: user.name.replace(/\.pdf$/i, ''), data: user.data, user: true };
-  const res = await fetch(bookMeta.samplePdf);
-  const buf = await res.arrayBuffer();
-  return { id: 'sample', name: t('reader.sample'), data: buf, user: false };
+  return { id: 'book', name: L(bookMeta.short), url: bookMeta.pdf, user: false };
 }
 
 export default {
@@ -31,17 +32,18 @@ export default {
     // ---------- DOM ----------
     const titleEl = h('div', { class: 'rd-title' });
     const pageInfo = h('div', { class: 'rd-pageinfo' });
+    const where = h('a', { class: 'rd-where' });
     const bmBtn = h('button', { class: 'btn icon ghost', title: t('reader.bookmarks'), html: icon('bookmark') });
     const top = h('div', { class: 'rd-top' },
-      h('a', { class: 'btn icon ghost', href: '#/home', html: icon('left'), title: t('back') }),
+      h('button', { class: 'btn icon ghost', html: icon('left'), title: t('back'), onclick: () => { if (history.length > 1) history.back(); else location.hash = '#/library'; } }),
       h('button', { class: 'btn icon ghost', title: t('reader.toc'), html: icon('list'), onclick: () => togglePanel() }),
-      titleEl, h('div', { class: 'grow' }), pageInfo,
+      titleEl, where, h('div', { class: 'grow' }), pageInfo,
       bmBtn,
       h('button', { class: 'btn icon ghost', title: t('reader.zoom') + ' −', html: icon('zoomOut'), onclick: () => setZoom(R.zoom - .25) }),
       h('button', { class: 'btn icon ghost', title: t('reader.zoom') + ' +', html: icon('zoomIn'), onclick: () => setZoom(R.zoom + .25) }),
       h('button', { class: 'btn icon ghost', title: t('reader.tint'), html: icon('sun'), onclick: () => cycleTint() }),
       h('button', { class: 'btn icon ghost', title: lang() === 'en' ? 'Full-page reading' : 'Čtení na celou plochu', html: icon('maximize'), onclick: () => immersive(true) }),
-      h('button', { class: 'btn small', html: icon('file') + `<span>${t('reader.open')}</span>`, onclick: () => openPdf() }));
+      h('button', { class: 'btn icon ghost', title: t('reader.open'), html: icon('file'), onclick: () => openPdf() }));
     const stage = h('div', { class: 'rd-stage' });
     const bookEl = h('div', { class: 'rd-book' });
     const desk = h('div', { class: 'rd-desk' }, bookEl);
@@ -64,11 +66,11 @@ export default {
     titleEl.textContent = src.name;
     let doc;
     try {
-      doc = await pdfjsLib.getDocument({ data: new Uint8Array(src.data.slice(0)), isEvalSupported: false }).promise;
+      doc = await pdfjsLib.getDocument(src.url ? { url: src.url, isEvalSupported: false } : { data: new Uint8Array(src.data.slice(0)), isEvalSupported: false }).promise;
     } catch (e) {
       loading.innerHTML = '';
       loading.append(h('div', {}, '⚠️ PDF se nepodařilo otevřít.'), h('code', {}, String(e.message || e)));
-      if (src.user) loading.append(h('button', { class: 'btn', onclick: async () => { await store.del('book:user'); location.reload(); } }, t('reader.useSample')));
+      if (src.user) loading.append(h('button', { class: 'btn', onclick: async () => { await store.del('book:user'); rerender(); } }, t('reader.useSample')));
       return;
     }
     R.doc = doc;
@@ -197,6 +199,16 @@ export default {
       prevBtn.disabled = !canFlip(-1);
       nextBtn.disabled = !canFlip(1);
       R.state.page = R.cur; saveState();
+      if (!src.user) {
+        const loc = locate(R.cur + 1);
+        if (loc) {
+          where.style.display = '';
+          where.href = `#/lesson/${loc.chapter.id}`;
+          where.innerHTML = `${emo(loc.chapter.emoji)}<span><b>${loc.chapter.n}.</b> ${L(loc.chapter.title)}${loc.section ? ` <i>§ ${loc.section.n}</i>` : ''}</span>`;
+          where.title = (lang() === 'en' ? 'Open the lesson' : 'Otevřít lekci');
+          if (profile.lastChapter !== loc.chapter.n) { profile.lastChapter = loc.chapter.n; saveProfile(); }
+        } else where.style.display = 'none';
+      } else where.style.display = 'none';
     }
     function canFlip(dir) {
       if (R.spread) { const s = spreadOf(R.cur); return dir > 0 ? 2 * s + 1 < R.n : s > 0; }
@@ -432,6 +444,14 @@ export default {
       panel.innerHTML = '';
       panel.append(h('div', { class: 'rd-panel-head' }, h('h3', { class: 'display' }, src.name), h('button', { class: 'btn icon ghost', html: icon('x'), onclick: () => togglePanel(false) })));
       const sec1 = h('div', { class: 'rd-psec' }, h('div', { class: 'eyebrow' }, t('reader.toc')));
+      if (outline === null && !src.user) {
+        outline = [];
+        for (const c of bookChapters) {
+          if (!c.page) continue;
+          outline.push({ title: `${c.n}. ${L(c.title)}`, page: c.page - 1, depth: 0, emoji: c.emoji });
+          for (const s2 of c.sections) outline.push({ title: `${s2.n} ${L(s2.title)}`, page: s2.page - 1, depth: 1 });
+        }
+      }
       if (outline === null) {
         try {
           const raw = await doc.getOutline();
@@ -451,15 +471,13 @@ export default {
         } catch (e) { outline = []; }
       }
       if (!outline.length) sec1.append(h('p', { class: 'muted small' }, t('reader.noOutline')));
-      outline.forEach(o => sec1.append(h('button', { class: 'rd-toc-item', style: { paddingLeft: 14 + o.depth * 16 + 'px' }, onclick: () => { if (o.page != null) { goTo(o.page); togglePanel(false); } } }, h('span', {}, o.title), h('small', {}, o.page != null ? String(o.page + 1) : ''))));
+      outline.forEach(o => sec1.append(h('button', { class: 'rd-toc-item' + (o.depth ? ' sub' : ' top') + (o.page != null && o.page <= R.cur && (outline.find(x => x.page > o.page && x.depth <= o.depth)?.page ?? 1e9) > R.cur ? ' here' : ''), style: { paddingLeft: 12 + o.depth * 18 + 'px' }, onclick: () => { if (o.page != null) { goTo(o.page); togglePanel(false); } } }, o.emoji ? h('span', { class: 'toc-emo', html: emo(o.emoji) }) : null, h('span', { class: 'grow' }, o.title), h('small', {}, o.page != null ? String(o.page + 1) : ''))));
+      requestAnimationFrame(() => panel.querySelector('.rd-toc-item.here:last-of-type, .rd-toc-item.here')?.scrollIntoView({ block: 'center' }));
       const sec2 = h('div', { class: 'rd-psec' }, h('div', { class: 'eyebrow' }, t('reader.bookmarks')));
       if (!R.state.bookmarks.length) sec2.append(h('p', { class: 'muted small' }, t('reader.noBookmarks')));
       R.state.bookmarks.forEach(i => sec2.append(h('button', { class: 'rd-toc-item bm', onclick: () => { goTo(i); togglePanel(false); } }, h('span', { html: icon('bookmark') + ` ${t('page')} ${i + 1}` }))));
-      const sec3 = h('div', { class: 'rd-psec' }, h('div', { class: 'eyebrow' }, lang() === 'en' ? 'Lessons' : 'Lekce'),
-        h('button', { class: 'btn small soft', onclick: () => { profile.sectionPages['1-1'] = R.cur + 1; saveProfile(); toast('✓ ' + t('reader.setStart')); } }, t('reader.setStart')),
-        h('a', { class: 'btn small', href: '#/lesson/1-1', html: icon('lesson') + '<span>1.1</span>' }));
-      panel.append(sec1, sec2, sec3);
-      if (src.user) panel.append(h('div', { class: 'rd-psec' }, h('button', { class: 'btn small ghost', onclick: async () => { await store.del('book:user'); location.hash = '#/reader'; location.reload(); } }, t('reader.useSample'))));
+      panel.append(sec2, sec1);
+      if (src.user) panel.append(h('div', { class: 'rd-psec' }, h('button', { class: 'btn small ghost', onclick: async () => { await store.del('book:user'); rerender(); } }, t('reader.useSample'))));
     }
     function togglePanel(force) {
       const open = force ?? !panel.classList.contains('open');
@@ -474,8 +492,7 @@ export default {
       await store.set('book:user', { name: file.name, size: file.size, data, added: Date.now() });
       toast('📖 ' + file.name);
       await flushSaves();
-      location.hash = '#/reader';
-      location.reload();
+      rerender();
     }
     async function openPdf() { useFile(await pickFile('application/pdf')); }
     root.addEventListener('dragover', e => { e.preventDefault(); root.classList.add('dragging'); });

@@ -1,0 +1,119 @@
+/* ---------- generic widget layout ---------- */
+.pp-wrap { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(220px, 1fr); gap: 18px; align-items: start; }
+.pp-plot, .cp-plot { background: var(--surface-2); border-radius: 18px; padding: 6px; }
+:root[data-theme="dark"] .pp-plot, :root[data-theme="dark"] .cp-plot { background: #151517; }
+.pp-side { display: flex; flex-direction: column; gap: 12px; }
+.pp-info { display: grid; gap: 6px; padding: 14px 16px; border-radius: 16px; background: var(--fill-2); font-size: 15.5px; }
+.pp-info .katex { font-size: 1.05em; }
+.pp-legend { display: grid; gap: 6px; }
+.pp-leg { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.pp-leg i { width: 22px; height: 4px; border-radius: 3px; flex: none; }
+.pp-ctrl { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+.pp-sliders { display: flex; flex-wrap: wrap; gap: 6px 22px; flex: 1; }
+.pp-slider { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px; }
+.pp-val { min-width: 88px; font-size: 15px; }
+.plot .pp-area { opacity: .16; }
+.good-t { color: var(--green); font-weight: 600; }
+.bad-t { color: var(--red); font-weight: 600; }
+@media (max-width: 900px) { .pp-wrap { grid-template-columns: 1fr; } }
+
+/* complex plane & vectors */
+.cp .seg, .el-tabs { margin-bottom: 12px; }
+.plot .cp-unit { fill: none; stroke: var(--ink-3); stroke-dasharray: 4 6; }
+.plot .cp-vec { stroke: var(--blue); stroke-width: 3.5; stroke-linecap: round; }
+.plot .cp-vec.ghost { stroke-dasharray: 5 6; }
+.plot .cp-vec.prod { stroke: var(--purple); }
+.plot .cp-pt { fill: var(--blue); stroke: #fff; stroke-width: 3; cursor: grab; }
+.plot .cp-pt.ghost { fill: var(--ink-3); }
+.plot .cp-lbl { font: italic 600 16px var(--font-book); fill: var(--ink); }
+.plot .cp-arc { fill: none; stroke-width: 2.5; }
+.plot .cp-poly { fill: color-mix(in srgb, var(--purple) 12%, transparent); stroke: var(--purple); stroke-width: 2; }
+.plot .cp-root { fill: var(--purple); animation: pop .4s var(--ease-spring) both; }
+.plot .cp-spiral { fill: none; stroke: var(--orange); stroke-width: 2; stroke-dasharray: 4 5; }
+.plot .vec-par { fill: color-mix(in srgb, var(--purple) 10%, transparent); }
+.plot .vec-proj { stroke: var(--green); stroke-width: 7; stroke-linecap: round; opacity: .7; }
+.plot .vec-area.pos { fill: color-mix(in srgb, var(--blue) 18%, transparent); }
+.plot .vec-area.neg { fill: color-mix(in srgb, var(--red) 18%, transparent); }
+.plot .vec-handle { stroke: #fff; stroke-width: 3; cursor: grab; opacity: .95; }
+
+/* matrix */
+.mx-row { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+.mx-mat { display: flex; align-items: stretch; gap: 4px; }
+.mx-br { width: 9px; border: 2.5px solid var(--ink); border-right: 0; border-radius: 8px 0 0 8px; }
+.mx-br.r { border: 2.5px solid var(--ink); border-left: 0; border-radius: 0 8px 8px 0; }
+.mx-grid { display: grid; grid-template-columns: 76px 76px; gap: 6px; padding: 6px 2px; }
+.mx-in { min-height: 40px; text-align: center; font-weight: 600; padding: 0 6px; }
+.plot .mx-gl { stroke: color-mix(in srgb, var(--blue) 30%, transparent); stroke-width: 1.2; }
+.plot .mx-gl.axis-t { stroke: color-mix(in srgb, var(--ink) 60%, transparent); stroke-width: 2; }
+.plot .mx-sq.pos { fill: color-mix(in srgb, var(--yellow) 45%, transparent); stroke: var(--orange); stroke-width: 2; }
+.plot .mx-sq.neg { fill: color-mix(in srgb, var(--red) 30%, transparent); stroke: var(--red); stroke-width: 2; }
+.plot .mx-eig { stroke: var(--purple); stroke-width: 3; stroke-dasharray: 10 8; opacity: .85; }
+
+/* fields */
+.plot .fld-arrow { stroke: var(--ink-2); stroke-width: 1.6; fill: none; stroke-linecap: round; }
+.plot .fld-p { fill: var(--blue); }
+.plot .fw-ring { fill: color-mix(in srgb, var(--surface) 70%, transparent); stroke: var(--orange); stroke-width: 3; }
+.plot .fw-blade { stroke: var(--orange); stroke-width: 4; stroke-linecap: round; }
+.plot .fw-hub { fill: var(--orange); }
+.plot .sf-seg { stroke: color-mix(in srgb, var(--ink) 40%, transparent); stroke-width: 1.8; stroke-linecap: round; }
+
+/* oscillators & brachistochrone & galton */
+.osc-wrap { background: var(--surface-2); border-radius: 18px; padding: 8px; }
+:root[data-theme="dark"] .osc-wrap { background: #151517; }
+.osc-svg, .br-svg, .gal-svg { width: 100%; height: auto; display: block; }
+.osc-wall { stroke: var(--ink-2); stroke-width: 6; stroke-linecap: round; }
+.osc-spring { fill: none; stroke: var(--ink-3); stroke-width: 2.5; stroke-linejoin: round; }
+.osc-spring.mid { stroke: var(--orange); }
+.osc-mass.a { fill: var(--blue); } .osc-mass.b { fill: var(--pink); }
+.osc-t { fill: #fff; font: italic 600 18px var(--font-book); text-anchor: middle; }
+.osc-axis { stroke: var(--line-2); }
+.osc-line { fill: none; stroke-width: 2.5; }
+.osc-line.a { stroke: var(--blue); } .osc-line.b { stroke: var(--pink); }
+.br-path { fill: none; stroke-width: 3.5; stroke-linecap: round; opacity: .9; }
+.br-ball { stroke: #fff; stroke-width: 3; filter: drop-shadow(0 3px 5px rgba(0,0,0,.25)); }
+.br-pin { fill: var(--ink); }
+.br-l { font: 700 16px var(--font-ui); fill: var(--ink); }
+.br-board { display: grid; gap: 6px; flex: 1; min-width: 240px; }
+.br-row { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 12px; background: var(--fill-2); font-size: 14.5px; transition: background .3s; }
+.br-row i { width: 12px; height: 12px; border-radius: 50%; }
+.br-row span { flex: 1; }
+.br-row.done { background: color-mix(in srgb, var(--green) 12%, var(--surface)); }
+.gal-peg { fill: var(--ink-3); }
+.gal-ball { fill: var(--orange); }
+.gal-bin { fill: color-mix(in srgb, var(--blue) 70%, transparent); }
+.gal-normal { fill: none; stroke: var(--red); stroke-width: 2.5; stroke-dasharray: 6 5; }
+
+/* newton, riemann, regression */
+.plot .nw-tan { stroke: var(--orange); stroke-width: 2.5; }
+.plot .nw-pt { fill: var(--orange); }
+.plot .nw-x { fill: var(--green); }
+.plot .nw-start { fill: var(--purple); }
+.nw-table { display: grid; gap: 4px; font-size: 14.5px; padding: 12px 14px; border-radius: 14px; background: var(--fill-2); }
+.plot .rm-bar { fill: color-mix(in srgb, var(--blue) 18%, transparent); stroke: color-mix(in srgb, var(--blue) 60%, transparent); stroke-width: 1.2; }
+.rm-errs { display: grid; gap: 4px; margin-top: 6px; }
+.rm-errs > div { display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.rm-errs i { height: 7px; border-radius: 4px; background: var(--ink-3); }
+.rm-errs .on i { background: var(--blue); }
+.rm-errs .on span { color: var(--ink); font-weight: 600; }
+.plot .rg-sq { fill: color-mix(in srgb, var(--orange) 16%, transparent); stroke: color-mix(in srgb, var(--orange) 55%, transparent); }
+.plot .rg-res { stroke: var(--orange); stroke-width: 2; }
+.plot .rg-pt { fill: var(--blue); stroke: #fff; stroke-width: 3; cursor: grab; }
+.plot .rg-mean { fill: var(--ink); }
+
+/* group */
+.gt-wrap { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
+.gt-stage { background: var(--surface-2); border-radius: 18px; }
+:root[data-theme="dark"] .gt-stage { background: #151517; }
+.gt-svg { width: 100%; height: auto; }
+.gt-tri { fill: color-mix(in srgb, var(--blue) 12%, var(--surface)); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.gt-l { fill: #fff; font: 700 15px var(--font-ui); text-anchor: middle; }
+.gt-axis { stroke: var(--ink-3); stroke-dasharray: 3 5; }
+.gt-ax-l { fill: var(--ink-3); font: 600 13px var(--font-ui); text-anchor: middle; }
+.gt-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.gt-btns .btn { font-size: 14px; min-height: 40px; }
+.gt-table { margin-top: 14px; overflow-x: auto; }
+.gt-cayley { border-collapse: collapse; margin: 0 auto; font-size: 15px; }
+.gt-cayley th, .gt-cayley td { width: 48px; height: 38px; text-align: center; border: .5px solid var(--line); }
+.gt-cayley th { background: var(--fill-2); }
+.gt-cayley td.hit { background: color-mix(in srgb, var(--yellow) 40%, transparent); }
+@media (max-width: 900px) { .gt-wrap { grid-template-columns: 1fr; } }
