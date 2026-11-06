@@ -61,3 +61,4 @@
 .switch i { position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-1); transition: transform .3s var(--ease-spring); }
 .switch.on { background: var(--good); }
 .switch.on i { transform: translateX(24px); }
+.lb-stack:empty { border: 1.5px dashed var(--line-2); border-radius: 6px; height: 28px; margin-top: 6px; }

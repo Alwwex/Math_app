@@ -40,6 +40,7 @@ export default {
       h('button', { class: 'btn icon ghost', title: t('reader.zoom') + ' −', html: icon('zoomOut'), onclick: () => setZoom(R.zoom - .25) }),
       h('button', { class: 'btn icon ghost', title: t('reader.zoom') + ' +', html: icon('zoomIn'), onclick: () => setZoom(R.zoom + .25) }),
       h('button', { class: 'btn icon ghost', title: t('reader.tint'), html: icon('sun'), onclick: () => cycleTint() }),
+      h('button', { class: 'btn icon ghost', title: lang() === 'en' ? 'Full-page reading' : 'Čtení na celou plochu', html: icon('maximize'), onclick: () => immersive(true) }),
       h('button', { class: 'btn small', html: icon('file') + `<span>${t('reader.open')}</span>`, onclick: () => openPdf() }));
     const stage = h('div', { class: 'rd-stage' });
     const bookEl = h('div', { class: 'rd-book' });
@@ -116,7 +117,8 @@ export default {
 
     // ---------- layout ----------
     function layout() {
-      const sw = stage.clientWidth - 48, sh = stage.clientHeight - 36;
+      const imm = root.classList.contains('immersive');
+      const sw = stage.clientWidth - (imm ? 32 : 48), sh = stage.clientHeight - (imm ? 20 : 36);
       R.spread = sw > 820 && sw / sh > R.aspect * 1.45;
       let ph = Math.min(sh, sw / (R.aspect * (R.spread ? 2 : 1)));
       ph = Math.max(200, ph) * R.zoom;
@@ -126,8 +128,8 @@ export default {
       bookEl.classList.toggle('spread', R.spread);
       bookEl.classList.toggle('single', !R.spread);
       root.classList.toggle('zoomed', R.zoom > 1.01);
-      desk.style.minWidth = (R.spread ? 2 * R.pageW : R.pageW) + 48 + 'px';
-      desk.style.minHeight = R.pageH + 36 + 'px';
+      desk.style.minWidth = (R.spread ? 2 * R.pageW : R.pageW) + (imm ? 32 : 48) + 'px';
+      desk.style.minHeight = R.pageH + (imm ? 20 : 36) + 'px';
     }
     const spreadOf = p => Math.floor((p + 1) / 2);
     function slotsFor(p) {
@@ -344,9 +346,10 @@ export default {
         const fling = -v * d.dir > .45;
         finishFlip(d.sess, d.sess.p > .33 || fling);
       } else if (Math.abs(e.clientX - d.x) < 8 && performance.now() - d.t < 400) {
-        // tap on the outer edge → turn
+        // tap on the outer edge → turn, tap in the middle → show/hide toolbars
         if (R.spread ? d.rel > .78 : d.rel > .7) flip(1);
         else if (R.spread ? d.rel < .22 : d.rel < .3) flip(-1);
+        else if (inkState.tool === 'hand') immersive(!root.classList.contains('immersive'));
       }
     }
     bookEl.addEventListener('pointerdown', e => {
@@ -376,6 +379,7 @@ export default {
       else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); flip(-1); }
       else if (e.key === 'Home') goTo(0); else if (e.key === 'End') goTo(R.n - 1);
       else if (e.key === 'b') toggleBookmark();
+      else if (e.key === 'Escape' && root.classList.contains('immersive')) immersive(false);
     };
     window.addEventListener('keydown', onKey);
     R.cleanup.push(() => window.removeEventListener('keydown', onKey));
@@ -388,6 +392,12 @@ export default {
     });
     scrub.addEventListener('change', () => { bubble.classList.remove('on'); goTo(scrub.value - 1); });
 
+    // full-page reading (hides the bars, bigger book)
+    function immersive(on) {
+      root.classList.toggle('immersive', on);
+      if (on) toast(lang() === 'en' ? 'Tap the middle of the page to show the toolbars' : 'Klepnutím doprostřed stránky se lišty zase ukážou', 2200);
+      requestAnimationFrame(() => { layout(); render(); });
+    }
     // zoom
     function setZoom(z) {
       R.zoom = clamp(Math.round(z * 100) / 100, 1, 3);
