@@ -21,8 +21,10 @@ export function h(tag, attrs = {}, ...kids) {
 }
 export const $ = (sel, root = document) => root.querySelector(sel);
 // 3D emoji image (Fluent Emoji, MIT) – looks the same on every platform
-export const emo = (name, cls = '') => `<img class="emo ${cls}" src="emoji/${name}.png" alt="" draggable="false">`;
-export function emoEl(name, cls = '') { const i = document.createElement('img'); i.className = 'emo ' + cls; i.src = `emoji/${name}.png`; i.alt = ''; i.draggable = false; return i; }
+// names like "fox" are the curated set, "u:1f984" is any emoji from the full set (emoji/u/)
+export const emoSrc = name => (String(name).startsWith('u:') ? `emoji/u/${name.slice(2)}.webp` : `emoji/${name}.png`);
+export const emo = (name, cls = '') => `<img class="emo ${cls}" src="${emoSrc(name)}" alt="" draggable="false">`;
+export function emoEl(name, cls = '') { const i = document.createElement('img'); i.className = 'emo ' + cls; i.src = emoSrc(name); i.alt = ''; i.draggable = false; return i; }
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
@@ -156,8 +158,38 @@ export function confetti({ x = innerWidth / 2, y = innerHeight / 3, count = 140,
 
 // ---------- Sounds (synthesised, no files needed) ----------
 let ac;
-function audio() { return (ac ||= new (window.AudioContext || window.webkitAudioContext)()); }
+export function audio() { const a = (ac ||= new (window.AudioContext || window.webkitAudioContext)()); if (a.state === 'suspended') a.resume().catch(() => {}); return a; }
+// quiet interface sounds – each one is a few dozen milliseconds of a soft sine or filtered noise
+const ui = () => profile.sounds && profile.uiSounds !== false;
+function blip(f1, f2, dur, vol, type = 'sine', delay = 0) {
+  const a = audio(), now = a.currentTime + delay;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f1, now); if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(f2, now + dur * .8);
+  g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(vol, now + .006); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
+  o.connect(g).connect(a.destination); o.start(now); o.stop(now + dur + .02);
+}
+let noiseBuf;
+function whoosh(f1, f2, dur, vol) {
+  const a = audio(), now = a.currentTime;
+  if (!noiseBuf) { noiseBuf = a.createBuffer(1, a.sampleRate, a.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const src = a.createBufferSource(); src.buffer = noiseBuf;
+  const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.4; bp.frequency.setValueAtTime(f1, now); bp.frequency.exponentialRampToValueAtTime(f2, now + dur);
+  const g = a.createGain(); g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(vol, now + dur * .35); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
+  src.connect(bp).connect(g).connect(a.destination); src.start(now); src.stop(now + dur + .05);
+}
+let lastTap = 0;
 export const sound = {
+  // soft click for buttons
+  tap() { if (!ui()) return; const n = performance.now(); if (n - lastTap < 45) return; lastTap = n; blip(1500, 1100, .05, .022, 'triangle'); },
+  // tiny tick (drag & drop, small changes)
+  tick() { if (!ui()) return; blip(2300, 2100, .035, .018); },
+  toggle(on = true) { if (!ui()) return; on ? (blip(880, 880, .07, .025), blip(1320, 1320, .09, .022, 'sine', .055)) : (blip(1320, 1320, .07, .022), blip(880, 880, .09, .022, 'sine', .055)); },
+  open() { if (!ui()) return; whoosh(500, 1900, .22, .03); blip(660, 990, .14, .012); },
+  close() { if (!ui()) return; whoosh(1700, 450, .2, .026); },
+  // lesson step finished – a soft marimba third
+  step() { if (!profile.sounds) return; blip(659.25, 659.25, .35, .045); blip(987.77, 987.77, .45, .04, 'sine', .09); },
+  swipe() { if (!ui()) return; whoosh(900, 2600, .16, .028); },
+  select() { if (!ui()) return; blip(1046.5, 1046.5, .12, .022); },
   correct() {
     if (!profile.sounds) return;
     const a = audio(), now = a.currentTime;

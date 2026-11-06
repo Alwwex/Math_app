@@ -24,13 +24,13 @@ function clock() {
 }
 
 // iOS-like PIN pad. resolves with the entered PIN or null (cancel)
-export function pinPad(host, { title, subtitle, length = 4, onSubmit, cancelLabel = T('Zrušit', 'Cancel') }) {
+export function pinPad(host, { title, subtitle, head = null, length = 4, onSubmit, cancelLabel = T('Zrušit', 'Cancel') }) {
   return new Promise(resolve => {
     let pin = '';
     const dots = h('div', { class: 'pin-dots' }, ...Array.from({ length }, () => h('i')));
     const keys = h('div', { class: 'pin-keys' });
     const sub = h('div', { class: 'pin-sub' }, subtitle || '');
-    const box = h('div', { class: 'pin' }, h('div', { class: 'pin-title' }, title), sub, dots, keys);
+    const box = h('div', { class: 'pin' }, head, h('div', { class: 'pin-title' }, title), sub, dots, keys);
     const render = () => [...dots.children].forEach((d, i) => d.classList.toggle('on', i < pin.length));
     const press = async k => {
       if (k === 'del') { pin = pin.slice(0, -1); render(); return; }
@@ -68,7 +68,7 @@ export async function showLock(root, onDone) {
   const grid = h('div', { class: 'lk-users' });
   const panel = h('div', { class: 'lk-panel' }, h('div', { class: 'lk-q' }, T('Kdo se dnes učí?', 'Who is studying today?')), grid);
   shell.append(clk, panel);
-  if (window.folio?.quit) shell.append(h('button', { class: 'lk-power', title: 'Ukončit', html: icon('x'), onclick: () => window.folio.quit() }));
+  if (window.folio?.quit && !window.folio.frameless) shell.append(h('button', { class: 'lk-power', title: 'Ukončit', html: icon('x'), onclick: () => window.folio.quit() }));
   const last = await store.get('global:lastUser');
   users.sort((a, b) => (b.id === last) - (a.id === last));
   users.forEach((u, i) => {
@@ -76,9 +76,8 @@ export async function showLock(root, onDone) {
     b.onclick = async () => {
       if (u.pin) {
         panel.classList.add('dim'); shell.classList.add('pinning');
-        const ok = await pinPad(shell, { title: u.name, subtitle: T('Zadej PIN', 'Enter your PIN'), onSubmit: p => verifyPin(u, p) });
-        panel.classList.remove('dim'); shell.classList.remove('pinning');
-        if (ok == null) return;
+        const ok = await pinPad(shell, { head: h('div', { class: 'pin-av' }, avatarEl(u, 60)), title: u.name, subtitle: T('Zadej PIN', 'Enter your PIN'), onSubmit: p => verifyPin(u, p) });
+        if (ok == null) { panel.classList.remove('dim'); shell.classList.remove('pinning'); return; }
       }
       await unlock(u);
     };
@@ -125,6 +124,15 @@ async function onboarding(shell, onDone, addOnly = false) {
       b.onclick = () => { data.avatar = a; preview.innerHTML = emo(a); preview.animate([{ transform: 'scale(.8)' }, { transform: 'scale(1)' }], { duration: 400, easing: 'cubic-bezier(.34,1.4,.64,1)' }); [...avs.children].forEach(x => x.classList.toggle('on', x === b)); };
       avs.append(b);
     });
+    const more = h('button', { class: 'ob-av more', title: T('Jakékoli emoji…', 'Any emoji…'), html: icon('plus') });
+    more.onclick = async () => {
+      const { pickEmoji } = await import('../emoji-picker.js');
+      const k = await pickEmoji(more, { title: T('Tvůj avatar', 'Your avatar') });
+      if (!k) return;
+      data.avatar = 'u:' + k; preview.innerHTML = emo(data.avatar); more.innerHTML = emo(data.avatar);
+      [...avs.children].forEach(x => x.classList.toggle('on', x === more));
+    };
+    avs.append(more);
     const cols = h('div', { class: 'ob-colors' });
     COLORS.forEach(c => {
       const b = h('button', { class: 'ob-color' + (c === data.color ? ' on' : ''), style: { '--c': c } });

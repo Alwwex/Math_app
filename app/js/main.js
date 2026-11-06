@@ -1,6 +1,12 @@
 import { profile, saveProfile, onProfile, currentStreak, level, flushSaves, store } from './store.js';
 import { t, L } from './i18n.js';
-import { h, $, toast, setGlossary, emo } from './util.js';
+import { h, $, toast, setGlossary, emo, sound } from './util.js';
+import { sideTools, mobileTools } from './tools-ui.js';
+import { setPadContext, closePad } from './pad.js';
+import { stopSpeaking } from './tts.js';
+import { resetMusic, loadFiles } from './music.js';
+import { initWindowControls } from './wctl.js';
+import { initEmojiText } from './emoji-text.js';
 import { icon } from './icons.js';
 import { chapters, glossaryLookup, loadAllChapters } from '../content/book.js';
 import { autoSignIn, currentUser } from './auth.js';
@@ -51,6 +57,7 @@ async function route() {
     const root = h('section', { class: 'view view-' + name + (document.startViewTransition ? '' : ' enter') });
     host.append(root);
     $('#app').classList.toggle('side-hidden', name === 'reader');
+    setPadContext(null);
     renderNav(name, params);
     try { cleanup = (await mod.default.mount(root, params, query)) || null; }
     catch (e) { console.error(e); root.append(h('div', { class: 'empty' }, h('h3', {}, 'Něco se pokazilo'), h('code', {}, String(e?.message || e)))); }
@@ -83,7 +90,7 @@ function renderNav(active, params = []) {
     list.append(h('a', { class: 'side-item side-chapter' + (curCh === c.id ? ' active' : ''), href: `#/chapter/${c.id}`, title: L(c.title),
       html: `<span class="num">${c.n || '★'}</span><span class="t">${L(c.title)}</span>${st?.finished ? '<span class="badge">✓</span>' : ''}` }));
   }
-  side.append(list, h('div', { class: 'side-spacer' }));
+  side.append(list, h('div', { class: 'side-spacer' }), sideTools());
   if (u) {
     const lv = level();
     side.append(h('div', { class: 'side-user' },
@@ -110,6 +117,9 @@ export async function enterApp() {
   locked = false;
   applyTheme();
   $('#app').classList.remove('locked');
+  document.body.classList.remove('is-locked');
+  mobileTools();
+  loadFiles();
   $('#app').classList.toggle('side-collapsed', !!profile.sideCollapsed);
   loadAllChapters();
   if (!location.hash || location.hash === '#/' || location.hash.startsWith('#/login')) location.hash = '#/home';
@@ -121,6 +131,8 @@ export async function lock() {
   try { cleanup?.(); } catch (e) { /* ignore */ }
   cleanup = null;
   locked = true;
+  closePad(); stopSpeaking(); resetMusic();
+  document.body.classList.add('is-locked');
   const { signOut } = await import('./auth.js');
   await signOut();
   $('#app').classList.add('locked');
@@ -148,6 +160,15 @@ async function boot() {
   }, true);
   document.addEventListener('gesturestart', e => e.preventDefault());
   window.addEventListener('hashchange', route);
+  initWindowControls();
+  initEmojiText(document.body);
+  // quiet click for buttons / list rows / switches (answers have their own sounds)
+  document.addEventListener('click', e => {
+    const el = e.target.closest?.('button, a[href], .cell, [role=button]');
+    if (!el || el.disabled || el.closest('.q-opt, .q-body, .ink-layer')) return;
+    if (el.classList.contains('switch')) sound.toggle(!el.classList.contains('on'));
+    else sound.tap();
+  }, true);
   window.addEventListener('keydown', e => {
     if (e.key === 'F11' && window.folio?.toggleFullscreen) { e.preventDefault(); window.folio.toggleFullscreen(); }
   });

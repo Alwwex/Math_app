@@ -1,7 +1,7 @@
 {
   "name": "folio-math",
   "productName": "Folio",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Folio – interaktivní učebnice k Mathematical Methods for Physics and Engineering: kniha, lekce, testy, kartičky a sešit (Windows, macOS, Linux, web).",
   "main": "electron/main.js",
   "private": true,

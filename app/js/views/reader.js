@@ -1,6 +1,8 @@
 // Čtečka PDF jako opravdová kniha: dvoustrana, otáčení listů (i tažením prstem), záložky,
 // obsah, přiblížení a psaní/zvýrazňování přímo do stránek. Vše se ukládá.
 import * as pdfjsLib from '../../vendor/pdfjs/pdf.min.js';
+import { togglePad } from '../pad.js';
+import { openSheet } from '../tools-ui.js';
 import { profile, saveProfile, store, saveLater, flushSaves } from '../store.js';
 import { t, lang } from '../i18n.js';
 import { h, clamp, pickFile, toast, sound, sleep } from '../util.js';
@@ -43,7 +45,9 @@ export default {
       h('button', { class: 'btn icon ghost', title: t('reader.zoom') + ' +', html: icon('zoomIn'), onclick: () => setZoom(R.zoom + .25) }),
       h('button', { class: 'btn icon ghost', title: t('reader.tint'), html: icon('sun'), onclick: () => cycleTint() }),
       h('button', { class: 'btn icon ghost', title: lang() === 'en' ? 'Full-page reading' : 'Čtení na celou plochu', html: icon('maximize'), onclick: () => immersive(true) }),
-      h('button', { class: 'btn icon ghost', title: t('reader.open'), html: icon('file'), onclick: () => openPdf() }));
+      h('button', { class: 'btn icon ghost', title: t('reader.open'), html: icon('file'), onclick: () => openPdf() }),
+      h('button', { class: 'btn icon ghost', title: lang() === 'en' ? 'Scratch paper' : 'Pomocný papír', html: icon('scratch'), onclick: () => togglePad() }),
+      h('button', { class: 'btn icon ghost', title: lang() === 'en' ? 'Study music' : 'Hudba ke studiu', html: icon('music'), onclick: e => openSheet(e.currentTarget) }));
     const stage = h('div', { class: 'rd-stage' });
     const bookEl = h('div', { class: 'rd-book' });
     const desk = h('div', { class: 'rd-desk' }, bookEl);

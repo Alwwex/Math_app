@@ -5,7 +5,8 @@ import { icon } from '../icons.js';
 import { chapter, chapters, loadChapter } from '../../content/book.js';
 import { widgets } from '../widgets/index.js';
 import { renderQuestion } from '../question.js';
-import { openPad, closePad } from '../pad.js';
+import { openPad, setPadContext } from '../pad.js';
+import { speakBlocks, blocksOf, stopSpeaking, ttsSupported } from '../tts.js';
 
 const NOTE = { tip: ['bulb', 'lesson.tip'], warn: ['warning', 'lesson.warn'], lang: ['globe', 'lesson.lang'], phys: ['atom', 'lesson.phys'] };
 
@@ -21,6 +22,9 @@ export default {
     let cleanups = [];
     root.classList.add('no-scroll');
     root.style.setProperty('--cc', sec.color);
+    const padTitle = () => `${t('notes')} · ${L(sec.title)}`;
+    setPadContext(`pad:lesson:${id}`, padTitle());
+    let renderGen = 0, pop = null;
 
     const side = h('aside', { class: 'lesson-side' });
     const main = h('div', { class: 'lesson-main' });
@@ -60,7 +64,7 @@ export default {
         case 'p': page.append(bi(b, 'p', 'para')); break;
         case 'math': page.append(h('div', { class: 'math-block', html: tex(lang() === 'en' && b.texEn ? b.texEn : b.tex, true) })); break;
         case 'def': {
-          const box = h('div', { class: 'box def' }, h('div', { class: 'box-head' }, h('span', { class: 'box-tag' }, t('lesson.definition')), h('span', {}, L(b.title))));
+          const box = h('div', { class: 'box def' }, h('div', { class: 'box-head' }, h('span', { class: 'box-tag' }, t('lesson.definition')), h('span', { html: lrt(b.title) })));
           box.append(bi(b, 'div', 'box-body'));
           page.append(box); break;
         }
@@ -117,7 +121,7 @@ export default {
 
     function renderExample(b) {
       const box = h('div', { class: 'example' });
-      box.append(h('div', { class: 'ex-head' }, h('span', { class: 'ex-tag' }, t('lesson.example')), h('span', {}, L(b.title))));
+      box.append(h('div', { class: 'ex-head' }, h('span', { class: 'ex-tag' }, t('lesson.example')), h('span', { html: lrt(b.title) })));
       box.append(h('div', { class: 'ex-task', html: lrt(b.task) }));
       const stepsBox = h('ol', { class: 'ex-steps' });
       box.append(stepsBox);
@@ -143,11 +147,22 @@ export default {
       const s = sec.steps[idx];
       st.step = idx; saveProfile();
       main.innerHTML = '';
+      const gen = ++renderGen;
+      stopSpeaking();
+      const lastStep = idx === sec.steps.length - 1;
+      const stepsBtn = h('button', { class: 'lt-steps', title: lang() === 'en' ? 'All steps' : 'Všechny kroky', html: `${icon('list')}<span>${t('lesson.step')} ${idx + 1} ${t('of')} ${sec.steps.length}</span>${icon('down')}` });
+      stepsBtn.onclick = e => { e.stopPropagation(); toggleStepsPop(stepsBtn); };
+      const readBtn = ttsSupported ? h('button', { class: 'btn small tinted', title: lang() === 'en' ? 'Read the step aloud' : 'Přečíst krok nahlas', html: icon('speak') + `<span>${lang() === 'en' ? 'Read aloud' : 'Předčíst'}</span>` }) : null;
+      if (readBtn) readBtn.onclick = () => speakBlocks(blocksOf(page), { title: L(s.title) });
       const top = h('div', { class: 'lesson-top' },
-        h('div', { class: 'grow' }, h('div', { class: 'sub' }, `${t('lesson.step')} ${idx + 1} ${t('of')} ${sec.steps.length}`),
-          h('div', { class: 'lesson-progress' }, ...sec.steps.map((x, i) => h('i', { class: (i === idx ? 'cur' : '') + (st.done.includes(x.id) ? ' done' : '') })))),
+        h('div', { class: 'lt-nav' },
+          h('button', { class: 'btn icon small ghost', title: t('prev') + ' (Alt+←)', disabled: idx === 0, html: icon('left'), onclick: () => go(idx - 1) }),
+          h('button', { class: 'btn icon small ghost', title: t('next') + ' (Alt+→)', disabled: lastStep, html: icon('right'), onclick: () => go(idx + 1) })),
+        h('div', { class: 'grow' }, stepsBtn,
+          h('div', { class: 'lesson-progress' }, ...sec.steps.map((x, i) => h('button', { class: (i === idx ? 'cur' : '') + (st.done.includes(x.id) ? ' done' : ''), title: `${i + 1}. ${L(x.title)}`, 'aria-label': `${i + 1}. ${L(x.title)}`, onclick: () => go(i) }, h('i'))))),
         langSeg(),
-        h('button', { class: 'btn small tinted', onclick: () => openPad(`pad:lesson:${id}`, `${t('notes')} · ${L(sec.title)}`), html: icon('pen') + `<span>${t('lesson.scratch')}</span>` }),
+        readBtn,
+        h('button', { class: 'btn small tinted', onclick: () => openPad(`pad:lesson:${id}`, padTitle()), html: icon('scratch') + `<span>${t('lesson.scratch')}</span>` }),
         s.page ? h('a', { class: 'btn small tinted', href: `#/reader?page=${s.page}`, html: icon('book') + `<span>${t('ch.p')} ${s.page}</span>` }) : null);
       const page = h('article', { class: 'lesson-page' + (dir > 0 ? ' in-right' : dir < 0 ? ' in-left' : '') });
       page.append(h('div', { class: 'page-kicker' }, h('span', { class: 'page-emoji', html: emo(s.emoji) }),
@@ -156,7 +171,7 @@ export default {
       if (profile.lang === 'both' && s.title.en) page.append(h('div', { class: 'page-title-en' }, s.title.en));
       const scroller = h('div', { class: 'lesson-scroll' }, page);
       main.append(top, scroller);
-      for (const b of s.blocks) await renderBlock(b, page);
+      for (const b of s.blocks) { await renderBlock(b, page); if (gen !== renderGen) return; }
       if (s.page) page.append(h('a', { class: 'book-ref', href: `#/reader?page=${s.page}`, html: `${emo('openbook')}<span><b>${lang() === 'en' ? 'In the book' : 'V knize'}</b> ${s.sec ? '§ ' + s.sec + ', ' : ''}${lang() === 'en' ? 'page' : 'strana'} ${s.page}</span>${icon('right')}` }));
       const nav = h('div', { class: 'lesson-nav' });
       if (idx > 0) nav.append(h('button', { class: 'btn big ghost', onclick: () => go(idx - 1), html: icon('left') + `<span>${t('prev')}</span>` }));
@@ -171,7 +186,7 @@ export default {
 
     function completeAndGo(btn, last) {
       const s = sec.steps[idx];
-      if (!st.done.includes(s.id)) { st.done.push(s.id); reward(10, btn); bump('steps'); saveProfile(); }
+      if (!st.done.includes(s.id)) { st.done.push(s.id); reward(10, btn); bump('steps'); saveProfile(); sound.step(); }
       if (last) {
         confetti(); sound.correct();
         toast(emo('party') + ' ' + t('lesson.done'));
@@ -183,8 +198,29 @@ export default {
       }
       go(idx + 1);
     }
+    function toggleStepsPop(anchor) {
+      if (pop) { closePop(); return; }
+      const r = anchor.getBoundingClientRect();
+      pop = h('div', { class: 'step-pop', style: { left: Math.max(8, Math.min(r.left, innerWidth - 348)) + 'px', top: r.bottom + 8 + 'px' } });
+      const list = h('ol', { class: 'step-list' });
+      sec.steps.forEach((x, i) => list.append(h('li', {}, h('button', { class: 'step-item' + (i === idx ? ' on' : '') + (st.done.includes(x.id) ? ' done' : ''), onclick: () => { closePop(); go(i); } },
+        h('span', { class: 'step-ic', html: emo(x.emoji) }), h('span', { class: 'step-t' }, L(x.title), x.sec ? h('small', {}, '§ ' + x.sec) : null),
+        st.done.includes(x.id) ? h('span', { class: 'step-check', html: icon('check') }) : null))));
+      pop.append(h('div', { class: 'step-pop-head' }, h('span', { html: emo(sec.emoji) }), h('b', {}, L(sec.title))), list);
+      document.body.append(pop);
+      sound.open();
+      requestAnimationFrame(() => { pop?.classList.add('open'); list.querySelector('.on')?.scrollIntoView({ block: 'center' }); });
+      setTimeout(() => document.addEventListener('pointerdown', outside, true), 0);
+    }
+    function outside(e) { if (pop && !pop.contains(e.target)) closePop(); }
+    function closePop() {
+      document.removeEventListener('pointerdown', outside, true);
+      const p = pop; pop = null;
+      if (p) { p.classList.remove('open'); setTimeout(() => p.remove(), 250); }
+    }
     function go(i) {
-      if (i === idx) return;
+      if (i === idx || i < 0 || i >= sec.steps.length) return;
+      sound.swipe();
       const dir = i > idx ? 1 : -1;
       idx = i;
       renderSide();
@@ -199,6 +235,6 @@ export default {
       if (e.key === 'ArrowLeft' && e.altKey && idx > 0) go(idx - 1);
     };
     window.addEventListener('keydown', onKey);
-    return () => { cleanups.forEach(c => c()); window.removeEventListener('keydown', onKey); closePad(); };
+    return () => { cleanups.forEach(c => c()); window.removeEventListener('keydown', onKey); closePop(); stopSpeaking(); setPadContext(null); };
   },
 };

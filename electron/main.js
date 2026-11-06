@@ -1,5 +1,6 @@
 // Folio – desktopová aplikace (Windows, macOS, Linux).
-// Startuje na celou obrazovku jako opravdová aplikace; F11 přepíná.
+// Startuje na celou obrazovku jako opravdová aplikace; F11 přepíná. Okno je bez systémového
+// rámečku – ovládá se vlastním „semaforem" ve stylu macOS (zavřít / schovat / okno ↔ celá obrazovka).
 // Obsah běží z vlastního protokolu folio://app/, takže data (IndexedDB)
 // zůstávají v uživatelské složce i po aktualizaci.
 const { app, BrowserWindow, protocol, net, shell, Menu, nativeTheme, ipcMain } = require('electron');
@@ -29,7 +30,9 @@ function createWindow() {
     width: st.bounds?.width || 1440,
     height: st.bounds?.height || 920,
     x: st.bounds?.x, y: st.bounds?.y,
-    minWidth: 760, minHeight: 560,
+    minWidth: 820, minHeight: 560,
+    frame: false,
+    roundedCorners: true,
     title: 'Folio',
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#000000' : '#f2f2f7',
     icon: path.join(__dirname, '..', 'build', 'icon.png'),
@@ -60,11 +63,21 @@ function createWindow() {
     if (input.control && input.key.toLowerCase() === 'q') { app.quit(); e.preventDefault(); }
   });
   win.on('close', () => saveState(win));
+  const fsChanged = () => win.webContents.send('fullscreen:changed', win.isFullScreen());
+  win.on('enter-full-screen', fsChanged);
+  win.on('leave-full-screen', fsChanged);
 }
 
 ipcMain.on('fullscreen:get', e => { e.returnValue = !!win?.isFullScreen(); });
 ipcMain.handle('fullscreen:toggle', () => { win.setFullScreen(!win.isFullScreen()); return win.isFullScreen(); });
 ipcMain.handle('app:quit', () => app.quit());
+ipcMain.handle('win:minimize', () => {
+  if (!win) return;
+  // macOS cannot minimise a full-screen window – leave full screen first
+  if (process.platform === 'darwin' && win.isFullScreen()) { win.once('leave-full-screen', () => win.minimize()); win.setFullScreen(false); }
+  else win.minimize();
+});
+ipcMain.handle('win:maximize', () => { if (!win) return; if (win.isMaximized()) win.unmaximize(); else win.maximize(); });
 
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
 

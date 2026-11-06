@@ -1,7 +1,7 @@
 // Sešity: stránky papíru (linky, čtverečky, tečky, osy) a psaní perem jako na iPadu.
 import { store, saveLater, flushSaves } from '../store.js';
 import { t, lang } from '../i18n.js';
-import { h, uid, modal, confirmDialog, download, toast } from '../util.js';
+import { h, uid, modal, confirmDialog, download, toast, emo } from '../util.js';
 import { icon } from '../icons.js';
 import { InkSurface, InkToolbar, inkState, drawStrokes } from '../ink.js';
 
@@ -39,7 +39,7 @@ async function listNotebooks(root) {
   root.append(h('div', { class: 'nb-inner' }, grid));
   idx.sort((a, b) => b.updated - a.updated).forEach((nb, i) => {
     grid.append(h('a', { class: 'nb-card rise', href: `#/notebook/${nb.id}`, style: { animationDelay: i * 50 + 'ms', '--cover': nb.color } },
-      h('div', { class: 'nb-cover' }, h('div', { class: 'nb-band' }), h('div', { class: 'nb-label' }, h('b', {}, nb.title), h('small', {}, `${nb.pages.length} ${t('nb.pages')}`)), h('div', { class: 'nb-rings' }, ...Array.from({ length: 7 }, () => h('i')))),
+      h('div', { class: 'nb-cover' }, h('div', { class: 'nb-band' }), nb.sticker ? h('div', { class: 'nb-sticker', html: emo(nb.sticker) }) : null, h('div', { class: 'nb-label' }, h('b', {}, nb.title), h('small', {}, `${nb.pages.length} ${t('nb.pages')}`)), h('div', { class: 'nb-rings' }, ...Array.from({ length: 7 }, () => h('i')))),
       h('div', { class: 'nb-meta' }, new Date(nb.updated).toLocaleDateString(lang() === 'en' ? 'en-GB' : 'cs-CZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))));
   });
   grid.append(h('button', { class: 'nb-card nb-new', onclick: () => newDialog() }, h('div', { class: 'nb-cover' }, h('div', { class: 'nb-plus', html: icon('plus') }), h('span', {}, t('nb.new')))));
@@ -60,16 +60,18 @@ async function listNotebooks(root) {
   }
 
   function newDialog() {
-    let color = COVERS[(idx.length) % COVERS.length], paper = 'lined';
+    let color = COVERS[(idx.length) % COVERS.length], paper = 'lined', sticker = 'u:1f4d0';
     const name = h('input', { class: 'input', value: (lang() === 'en' ? 'Notebook ' : 'Sešit ') + (idx.length + 1) });
     const colors = h('div', { class: 'nb-colors' });
     COVERS.forEach(c => { const b = h('button', { class: 'swatch big' + (c === color ? ' on' : ''), style: { '--c': c } }); b.onclick = () => { color = c; [...colors.children].forEach(x => x.classList.toggle('on', x === b)); }; colors.append(b); });
     const papers = h('div', { class: 'nb-papers' });
     PAPERS.forEach(p => { const b = h('button', { class: 'paper-pick' + (p === paper ? ' on' : '') }, paperThumb(p), h('span', {}, t('paper.' + p))); b.onclick = () => { paper = p; [...papers.children].forEach(x => x.classList.toggle('on', x === b)); }; papers.append(b); });
-    const body = h('div', {}, h('div', { class: 'field' }, h('label', {}, t('nb.name')), name), h('div', { class: 'field' }, h('label', {}, t('nb.color')), colors), h('div', { class: 'field' }, h('label', {}, t('nb.paper')), papers));
+    const stickerBtn = h('button', { class: 'nb-sticker-pick', title: lang() === 'en' ? 'Sticker' : 'Nálepka', html: emo(sticker) });
+    stickerBtn.onclick = async () => { const { pickEmoji } = await import('../emoji-picker.js'); const k = await pickEmoji(stickerBtn, { title: lang() === 'en' ? 'Cover sticker' : 'Nálepka na desky' }); if (k) { sticker = 'u:' + k; stickerBtn.innerHTML = emo(sticker); } };
+    const body = h('div', {}, h('div', { class: 'field' }, h('label', {}, t('nb.name')), h('div', { class: 'row' }, stickerBtn, name)), h('div', { class: 'field' }, h('label', {}, t('nb.color')), colors), h('div', { class: 'field' }, h('label', {}, t('nb.paper')), papers));
     modal({ title: t('nb.new'), body, actions: [{ label: t('cancel'), cls: 'ghost' }, { label: t('create'), cls: 'primary', onClick: async () => {
       const id = uid(), p1 = uid();
-      idx.push({ id, title: name.value.trim() || 'Sešit', color, paper, pages: [p1], created: Date.now(), updated: Date.now() });
+      idx.push({ id, title: name.value.trim() || 'Sešit', color, paper, sticker, pages: [p1], created: Date.now(), updated: Date.now() });
       await store.set('nbpage:' + p1, { paper, strokes: [] });
       await setIndex(idx);
       location.hash = '#/notebook/' + id;

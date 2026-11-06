@@ -4,7 +4,8 @@ import { h, lrt, reward, confetti, shuffle, sound, emo } from '../util.js';
 import { icon } from '../icons.js';
 import { chapter, loadChapter, loadAllChapters } from '../../content/book.js';
 import { renderQuestion } from '../question.js';
-import { openPad, closePad } from '../pad.js';
+import { openPad, setPadContext } from '../pad.js';
+import { speakBlocks, blocksOf, stopSpeaking, ttsSupported } from '../tts.js';
 
 export default {
   async mount(root, params) {
@@ -22,6 +23,9 @@ export default {
       pool = sec.quiz.map(q => ({ ...q, _ch: sec }));
     }
     const qs = quizState(sec.id);
+    const padKey = `pad:quiz:${sec.id}`, padTitle = `${t('quiz.scratch')} · ${L(sec.title)}`;
+    setPadContext(padKey, padTitle);
+    let curQ = null;
     root.classList.add('quiz-view');
     root.style.setProperty('--cc', sec.color);
     const wrap = h('div', { class: 'quiz-wrap' });
@@ -64,9 +68,10 @@ export default {
       const dots = h('div', { class: 'quiz-dots' }, ...list.map(() => h('i')));
       const comboEl = h('div', { class: 'quiz-combo' });
       const bar = h('div', { class: 'quiz-bar' },
-        h('button', { class: 'btn icon ghost', html: icon('x'), 'aria-label': t('close'), onclick: () => { closePad(); intro(); } }),
+        h('button', { class: 'btn icon ghost', html: icon('x'), 'aria-label': t('close'), onclick: () => { stopSpeaking(); intro(); } }),
         dots, comboEl,
-        h('button', { class: 'btn small tinted', html: icon('pen') + `<span>${t('quiz.scratch')}</span>`, onclick: () => openPad(`pad:quiz:${sec.id}`, `${t('quiz.scratch')} · ${L(sec.title)}`) }));
+        ttsSupported ? h('button', { class: 'btn small tinted', title: lang() === 'en' ? 'Read the question aloud' : 'Přečíst otázku nahlas', html: icon('speak') + `<span>${lang() === 'en' ? 'Read' : 'Přečíst'}</span>`, onclick: () => curQ && speakBlocks(blocksOf(curQ, '.q-text, .q-opt, .q-fb.show'), { title: lang() === 'en' ? 'Question' : 'Otázka' }) }) : null,
+        h('button', { class: 'btn small tinted', html: icon('scratch') + `<span>${t('quiz.scratch')}</span>`, onclick: () => openPad(padKey, padTitle) }));
       const stage = h('div', { class: 'quiz-stage' });
       wrap.append(bar, stage);
 
@@ -94,13 +99,14 @@ export default {
           },
         });
         el.classList.add('q-enter');
+        curQ = el; stopSpeaking();
         stage.append(el, h('div', { class: 'quiz-next-row' }, nextBtn));
         nextBtn.onclick = () => { i++; if (i < list.length) show(); else finish(); };
         el.querySelector('input')?.focus({ preventScroll: true });
       }
 
       function finish() {
-        closePad();
+        stopSpeaking();
         const total = list.length, pct = score / total;
         qs.attempts.push({ date: Date.now(), score, total, kind });
         if (pct > qs.best) qs.best = pct;
@@ -138,6 +144,6 @@ export default {
       show();
     }
     intro();
-    return () => closePad();
+    return () => { stopSpeaking(); setPadContext(null); };
   },
 };

@@ -1,17 +1,18 @@
 /* ---------- lock screen & onboarding ---------- */
-.lk { position: absolute; inset: 0; overflow: hidden; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding: 30px; transition: transform .55s var(--ease-ios), opacity .55s var(--ease-ios); }
+.lk { position: absolute; inset: 0; overflow: hidden; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(18px, 5.5vh, 44px); padding: 44px 30px 30px; transition: transform .55s var(--ease-ios), opacity .55s var(--ease-ios); }
 .lk.unlocking { transform: translateY(-6%) scale(1.04); opacity: 0; }
 .lk-wall { position: absolute; inset: -60px; z-index: -1; background: url(../book/cover.jpg) center/cover; filter: blur(46px) saturate(1.5) brightness(.75); transform: scale(1.15); animation: wall 24s ease-in-out infinite alternate; }
 .lk-wall::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,.05), rgba(0,0,0,.45)); }
 @keyframes wall { to { transform: scale(1.25) translate(2%, -2%) rotate(1.5deg); } }
-.lk-clock { text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.2); animation: rise .8s var(--ease) both; }
-.lk-date { font: 600 20px var(--font-display); opacity: .9; }
+/* the entrance animation must not keep filling, otherwise it overrides the hidden state while a PIN is typed */
+.lk-clock { text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,.2); animation: rise .8s var(--ease) backwards; flex: none; }
+.lk-date { font: 600 clamp(15px, 2.6vh, 20px) var(--font-display); opacity: .9; }
 .lk-date::first-letter { text-transform: uppercase; }
 .lk-clock { transition: opacity .3s, transform .4s var(--ease-ios); }
-.lk.pinning .lk-clock { opacity: 0; transform: translateY(-20px) scale(.96); pointer-events: none; }
-.lk-time { font: 700 104px/1 var(--font-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-.lk-panel { display: flex; flex-direction: column; align-items: center; gap: 22px; transition: opacity .3s, transform .4s var(--ease-ios); }
-.lk-panel.dim { opacity: 0; transform: scale(.95); pointer-events: none; }
+.lk.pinning .lk-clock { opacity: 0; visibility: hidden; transform: translateY(-20px) scale(.96); pointer-events: none; transition: opacity .25s, transform .4s var(--ease-ios), visibility 0s .25s; }
+.lk-time { font: 700 clamp(58px, 15vh, 104px)/1 var(--font-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.lk-panel { display: flex; flex-direction: column; align-items: center; gap: clamp(12px, 3vh, 22px); transition: opacity .3s, transform .4s var(--ease-ios), visibility 0s; flex: none; max-height: 62vh; overflow-y: auto; padding: 6px 10px 10px; }
+.lk-panel.dim { opacity: 0; visibility: hidden; transform: scale(.95); pointer-events: none; transition: opacity .25s, transform .4s var(--ease-ios), visibility 0s .25s; }
 .lk-q { font: 600 17px var(--font-display); opacity: .9; }
 .lk-users { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; max-width: 760px; }
 .lk-user { display: flex; flex-direction: column; align-items: center; gap: 10px; border: 0; background: none; color: #fff; font-weight: 600; font-size: 15px; transition: transform .3s var(--ease-spring); padding: 0; }
@@ -22,18 +23,20 @@
 .lk-user .avatar.add { width: 84px; height: 84px; background: rgba(255,255,255,.18); backdrop-filter: blur(20px); color: #fff; }
 .lk-user .avatar.add svg { width: 34px; height: 34px; }
 
-.pin { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; animation: pin-in .5s var(--ease-ios) both; z-index: 5; }
+.pin { --key: clamp(54px, 9.2vh, 80px); position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(6px, 1.6vh, 14px); animation: pin-in .5s var(--ease-ios) both; z-index: 5; }
 .pin.out { animation: pin-out .3s var(--ease) both; }
 @keyframes pin-in { from { opacity: 0; transform: translateY(40px); } }
 @keyframes pin-out { to { opacity: 0; transform: translateY(20px); } }
 .pin-title { font: 600 22px var(--font-display); }
+.pin-av .avatar { box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 0 0 3px rgba(255,255,255,.35); margin-bottom: 4px; }
+@media (max-height: 600px) { .pin-av { display: none; } }
 .pin-sub { font-size: 15px; opacity: .85; min-height: 20px; }
-.pin-dots { display: flex; gap: 22px; margin: 10px 0 18px; }
+.pin-dots { display: flex; gap: 22px; margin: clamp(4px, 1.2vh, 10px) 0 clamp(8px, 2.2vh, 18px); }
 .pin-dots i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; transition: background .15s, transform .2s var(--ease-spring); }
 .pin-dots i.on { background: #fff; transform: scale(1.1); }
-.pin-keys { display: grid; grid-template-columns: repeat(3, 80px); gap: 16px 26px; }
-.pin-key { width: 80px; height: 80px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); backdrop-filter: blur(22px); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background .12s; }
-.pin-key b { font: 400 34px/1 var(--font-display); }
+.pin-keys { display: grid; grid-template-columns: repeat(3, var(--key)); gap: clamp(10px, 1.9vh, 16px) clamp(18px, 2.6vh, 26px); }
+.pin-key { width: var(--key); height: var(--key); border-radius: 50%; border: 0; background: rgba(255,255,255,.16); backdrop-filter: blur(22px); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background .12s; }
+.pin-key b { font: 400 calc(var(--key) * .42)/1 var(--font-display); }
 .pin-key small { font-size: 10px; font-weight: 700; letter-spacing: .16em; opacity: .9; height: 12px; }
 .pin-key:active { background: rgba(255,255,255,.45); }
 .pin-key.text { background: transparent; backdrop-filter: none; font-size: 16px; font-weight: 500; }
@@ -57,7 +60,10 @@
 .ob-name { width: 100%; max-width: 340px; text-align: center; background: rgba(255,255,255,.14); color: #fff; font-size: 18px; font-weight: 600; }
 .ob-name::placeholder { color: rgba(255,255,255,.6); }
 .ob-name:focus { background: rgba(255,255,255,.22); box-shadow: 0 0 0 3px rgba(255,255,255,.35); }
-.ob-avatars { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; width: 100%; }
+.ob-avatars { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; width: 100%; }
+.ob-av.more, .set-av.more { color: var(--accent); }
+.ob-av.more { color: #fff; }
+.ob-av.more svg, .set-av.more svg { width: 60%; height: 60%; }
 .ob-av { aspect-ratio: 1; border-radius: 14px; border: 0; background: rgba(255,255,255,.08); display: grid; place-items: center; transition: transform .25s var(--ease-spring), background .2s; padding: 4px; }
 .ob-av .emo { width: 100%; height: 100%; }
 .ob-av.on { background: rgba(255,255,255,.32); transform: scale(1.08); }
@@ -70,8 +76,8 @@
 .ob .seg button { color: #fff; }
 .ob .seg button.on { background: rgba(255,255,255,.3); box-shadow: none; }
 .ob .btn.ghost { color: #fff; }
-.ob-pinhost { position: relative; width: 100%; height: 470px; }
-.ob-pinhost .pin { position: absolute; }
-@media (max-width: 560px) { .ob-avatars { grid-template-columns: repeat(6, 1fr); } .lk-time { font-size: 76px; } .pin-keys { grid-template-columns: repeat(3, 72px); gap: 12px 20px; } .pin-key { width: 72px; height: 72px; } }
+.ob-pinhost { position: relative; width: 100%; }
+.ob-pinhost .pin { position: relative; inset: auto; }
+@media (max-width: 560px) { .ob-avatars { grid-template-columns: repeat(6, 1fr); } .lk-time { font-size: min(76px, 15vh); } .pin { --key: min(72px, 9.2vh); } }
 .lk-power { position: absolute; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); backdrop-filter: blur(20px); color: #fff; display: grid; place-items: center; }
 .lk-power svg { width: 20px; height: 20px; }

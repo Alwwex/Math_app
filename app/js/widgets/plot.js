@@ -121,9 +121,10 @@ export class Plot {
     return { x: this.ix(p.x), y: this.iy(p.y), px: p.x, py: p.y };
   }
   // simple drag helper on the whole svg
-  onDrag(fn, { start } = {}) {
+  onDrag(fn, { start, axis = 'x' } = {}) {
     let active = false;
-    this.svg.style.touchAction = 'none';
+    // horizontal drags keep vertical finger-scrolling of the lesson alive
+    this.svg.style.touchAction = axis === 'x' ? 'pan-y pinch-zoom' : 'none';
     this.svg.addEventListener('pointerdown', e => {
       if (start && !start(this.toPlot(e), e)) return;
       active = true; this.svg.setPointerCapture(e.pointerId); fn(this.toPlot(e), e, 'start');

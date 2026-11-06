@@ -4,6 +4,7 @@ import { h, download, pickFile, toast, confirmDialog, emo, modal } from '../util
 import { icon } from '../icons.js';
 import { applyTheme, rerender, lock } from '../main.js';
 import { currentUser, updateUser, deleteUser, verifyPin, AVATARS, COLORS } from '../auth.js';
+import { ttsSupported, voicesFor, ttsPrefs, onVoices, speakText } from '../tts.js';
 
 function abToB64(buf) { let s = ''; const b = new Uint8Array(buf); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); }
 function b64ToAb(str) { const s = atob(str); const b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b.buffer; }
@@ -14,6 +15,7 @@ export default {
     const inner = h('div', { class: 'set-inner' });
     root.append(inner);
     const E = (cs, en) => (lang() === 'en' ? en : cs);
+    const cleanups = [];
 
     const seg = (opts, cur, on) => { const s = h('div', { class: 'seg' }); opts.forEach(([v, l]) => s.append(h('button', { class: cur === v ? 'on' : '', onclick: () => on(v) }, l))); return s; };
     const toggle = (val, on) => { const b = h('button', { class: 'switch' + (val ? ' on' : ''), role: 'switch', 'aria-checked': String(!!val) }, h('i')); b.onclick = () => { val = !val; b.classList.toggle('on', val); b.setAttribute('aria-checked', String(val)); on(val); }; return b; };
@@ -28,6 +30,9 @@ export default {
     nameIn.onchange = async () => { const n = nameIn.value.trim(); if (!n) return; await updateUser(u.id, { name: n }); profile.name = n; saveProfile(); rerender(); };
     const avs = h('div', { class: 'set-avatars' });
     AVATARS.forEach(a => { const b = h('button', { class: 'set-av' + (a === u.avatar ? ' on' : ''), html: emo(a) }); b.onclick = async () => { await updateUser(u.id, { avatar: a }); av.innerHTML = emo(a); [...avs.children].forEach(x => x.classList.toggle('on', x === b)); rerender(); }; avs.append(b); });
+    const more = h('button', { class: 'set-av more' + (String(u.avatar).startsWith('u:') ? ' on' : ''), title: E('Jakékoli emoji…', 'Any emoji…'), html: String(u.avatar).startsWith('u:') ? emo(u.avatar) : icon('plus') });
+    more.onclick = async () => { const { pickEmoji } = await import('../emoji-picker.js'); const k = await pickEmoji(more, { title: E('Tvůj avatar', 'Your avatar') }); if (!k) return; await updateUser(u.id, { avatar: 'u:' + k }); rerender(); };
+    avs.append(more);
     const cols = h('div', { class: 'set-colors' });
     COLORS.forEach(c => { const b = h('button', { class: 'set-color' + (c === u.color ? ' on' : ''), style: { '--c': c } }); b.onclick = async () => { await updateUser(u.id, { color: c }); av.style.setProperty('--av', c); [...cols.children].forEach(x => x.classList.toggle('on', x === b)); }; cols.append(b); });
     inner.append(h('section', {}, h('div', { class: 'group-title' }, t('set.profile')), h('div', { class: 'group' }, h('div', { class: 'set-profile' }, av, h('div', { class: 'grow' }, nameIn)), avs, cols)));
@@ -52,13 +57,37 @@ export default {
     inner.append(group(E('Jazyk a vzhled', 'Language & appearance'),
       cell('globe', '#007aff', t('set.lang'), seg([['cs', 'CZ'], ['en', 'EN'], ['both', 'CZ+EN']], profile.lang, v => { profile.lang = v; saveProfile(); applyTheme(); rerender(); }), t('set.langHint')),
       cell('moon', '#1c1c1e', t('set.theme'), seg([['light', t('set.light')], ['dark', t('set.dark')], ['auto', t('set.auto')]], profile.theme, v => { profile.theme = v; saveProfile(); applyTheme(); rerender(); })),
-      window.folio ? cell('fullscreen', '#30b0c7', t('set.fullscreen'), toggle(window.folio.isFullscreen(), () => window.folio.toggleFullscreen()), 'F11') : null,
+      window.folio ? cell('fullscreen', '#30b0c7', t('set.fullscreen'), toggle(window.folio.isFullscreen(), () => window.folio.toggleFullscreen()), E('F11 · nebo zelené tlačítko vlevo nahoře', 'F11 · or the green button top-left')) : null,
       window.folio ? h('button', { class: 'cell', onclick: () => window.folio.quit() }, h('div', { class: 'ic-box', style: { background: '#8e8e93' }, html: icon('x') }), h('div', { class: 'lines' }, h('b', {}, E('Ukončit aplikaci', 'Quit the app')), h('small', {}, 'Ctrl+Q · Alt+F4')), h('span', { class: 'chev', html: icon('right') })) : null));
 
     inner.append(group(E('Pero a zvuk', 'Pen & sound'),
       cell('pen', '#ff2d55', t('set.penOnly'), toggle(profile.penOnly, v => { profile.penOnly = v; saveProfile(); }), t('set.penOnlyHint')),
       cell('volume', '#ff3b30', t('set.sounds'), toggle(profile.sounds, v => { profile.sounds = v; saveProfile(); })),
+      cell('sparkles', '#af52de', E('Jemné zvuky rozhraní', 'Subtle interface sounds'), toggle(profile.uiSounds !== false, v => { profile.uiSounds = v; saveProfile(); }), E('Tiché ťuknutí u tlačítek, přepínačů a oken', 'Soft taps for buttons, switches and windows')),
       cell('book', '#a2845e', t('set.flipSound'), toggle(profile.flipSound, v => { profile.flipSound = v; saveProfile(); }))));
+
+    // read aloud (text-to-speech)
+    if (ttsSupported) {
+      const P = ttsPrefs();
+      const voiceSel = (lng, key) => {
+        const sel = h('select', { class: 'input set-select' });
+        const fill = () => {
+          const list = voicesFor(lng);
+          sel.innerHTML = '';
+          sel.append(h('option', { value: '' }, list.length ? E('Automaticky', 'Automatic') : E('Žádný hlas v systému', 'No voice installed')));
+          list.forEach(v => sel.append(h('option', { value: v.name, selected: P[key] === v.name }, v.name.replace(/^Microsoft\s+/, '').replace(/\s+-\s+.*$/, '') + (v.localService ? '' : ' ☁'))));
+        };
+        fill();
+        const off = onVoices(fill);
+        cleanups.push(off);
+        sel.onchange = () => { P[key] = sel.value; saveProfile(); speakText(lng === 'cs' ? 'Ahoj, takhle budu předčítat lekce.' : 'Hi, this is how I will read your lessons.', lng); };
+        return sel;
+      };
+      inner.append(group(E('Předčítání', 'Read aloud'),
+        cell('speak', '#34c759', E('Český hlas', 'Czech voice'), voiceSel('cs', 'voiceCs'), E('Další hlasy: Nastavení Windows → Čas a jazyk → Řeč', 'More voices: Windows Settings → Time & language → Speech')),
+        cell('globe', '#007aff', E('Anglický hlas', 'English voice'), voiceSel('en', 'voiceEn')),
+        cell('play', '#ff9500', E('Rychlost', 'Speed'), seg([[0.8, '0,8×'], [1, '1×'], [1.15, '1,15×'], [1.3, '1,3×'], [1.5, '1,5×']], P.rate || 1, v => { P.rate = v; saveProfile(); speakText(E('Rychlost předčítání', 'Reading speed'), lang() === 'en' ? 'en' : 'cs'); rerender(); }))));
+    }
 
     // data
     const usage = h('span', { class: 'val' }, '…');
@@ -66,7 +95,7 @@ export default {
     const exportBackup = async () => {
       await flushSaves();
       const out = {};
-      for (const [k, v] of await store.entries('')) { if (k.startsWith('global:')) continue; out[k] = v instanceof ArrayBuffer ? { __ab: abToB64(v) } : (v && v.data instanceof ArrayBuffer ? { ...v, data: { __ab: abToB64(v.data) } } : v); }
+      for (const [k, v] of await store.entries('')) { if (k.startsWith('global:') || k.startsWith('music:')) continue; out[k] = v instanceof ArrayBuffer ? { __ab: abToB64(v) } : (v && v.data instanceof ArrayBuffer ? { ...v, data: { __ab: abToB64(v.data) } } : v); }
       download(new Blob([JSON.stringify({ app: 'folio', version: 2, user: { name: u.name, avatar: u.avatar, color: u.color }, date: new Date().toISOString(), data: out })], { type: 'application/json' }), `folio-${u.name}-${new Date().toLocaleDateString('sv-SE')}.json`);
       toast(emo('check') + ' ' + t('set.saved'));
     };
@@ -104,8 +133,9 @@ export default {
       btnCell('trash', '#ff3b30', t('set.deleteProfile'), delProfile, true)));
 
     inner.append(h('section', {}, h('div', { class: 'group-title' }, t('set.about')), h('div', { class: 'group' }, h('div', { class: 'cell no-icon' }, h('div', { class: 'lines' },
-      h('b', {}, 'Folio 2.0'),
+      h('b', {}, 'Folio 3.0'),
       h('small', { style: { whiteSpace: 'normal' } }, E('Kniha: K. F. Riley, M. P. Hobson, S. J. Bence – Mathematical Methods for Physics and Engineering (Cambridge University Press). Lekce, testy a kartičky jsou vlastní studijní materiál ke knize.', 'Book: Riley, Hobson & Bence – Mathematical Methods for Physics and Engineering (CUP). Lessons, tests and cards are original study material for the book.')),
       h('small', { style: { whiteSpace: 'normal', marginTop: '6px' } }, 'pdf.js (Apache-2.0) · KaTeX (MIT) · perfect-freehand (MIT) · Fluent Emoji (MIT) · Inter, Literata, Caveat (OFL)'))))));
+    return () => cleanups.forEach(f => f());
   },
 };
