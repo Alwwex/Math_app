@@ -14,7 +14,7 @@ Běží na **Windows** (dotyk + pero), **macOS**, **Linuxu** a ve **webovém pro
 | 📖 **Kniha** | Tvoje PDF jako opravdová kniha: dvoustrana, otáčení listů ve 3D (prstem, perem, myší), záložky, český obsah, režim na celou plochu, psaní a zvýrazňování přímo do stránek. Nahoře vždy vidíš, ve které kapitole a oddílu jsi. |
 | 💡 **Lekce** | 148 kroků výkladu česky / anglicky / obojí, řešené příklady, rychlé otázky, odkaz na stranu v knize. 21 interaktivních animací (komplexní rovina, vektory, matice, vektorová pole, směrová pole ODR, normální módy, Fourierovy řady, brachistochrona, Galtonova deska, Newtonova metoda, regrese, grupy symetrií…). |
 | ✅ **Testy** | 235 otázek – test ke každé kapitole, mix z celé knihy, oprava chyb, pomocný papír na výpočty. |
-| 🃏 **Kartičky** | 283 pojmů česky ↔ anglicky, chytré opakování (Leitner), výslovnost. |
+| 🃏 **Kartičky** | 283 pojmů a jejich význam – vše česky i anglicky zároveň. Tři režimy: *Co to znamená?* (pojem → význam), *Který pojem?* (význam → pojem) a *Výběr* ze čtyř významů. Chytré opakování (Leitnerovy krabičky), předčítání v obou jazycích, slovníček s hledáním i podle významu. |
 | ✏️ **Sešity** | Papír linkovaný, čtverečkovaný, tečkovaný nebo s osami; pero s přítlakem, zvýrazňovač, guma, pravítko, export do PNG. |
 | 📝 **Pomocný papír** | Plovoucí okno, které jde chytit a přesunout kamkoli (myší, prstem i perem), zvětšit tahem za roh, zmenšit na lísteček nebo přichytit k pravému okraji. Je v lekcích, testech, knize i všude jinde (tlačítko v postranním panelu). |
 | 🔊 **Předčítání** | Lekce i otázky z testů čte nahlas česky i anglicky, vzorce převádí na slova („integrál od 0 do nekonečna…"), zvýrazňuje čtený odstavec. Hlas a rychlost v Nastavení. |

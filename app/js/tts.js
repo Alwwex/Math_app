@@ -215,6 +215,14 @@ export function speakText(text, lang = profile.lang === 'en' ? 'en' : 'cs') {
   S.gen++; synth.cancel();
   chunks(text).forEach(c => synth.speak(utter(c, lang)));
 }
+// several pieces in a row, each in its own language (e.g. a term in Czech, then in English)
+export function speakParts(parts) {
+  if (!ttsSupported) return;
+  S.gen++; synth.cancel();
+  parts.filter(p => p.text).forEach(p => chunks(p.text).forEach(c => synth.speak(utter(c, p.lang))));
+}
+// rich text with $math$ → plain spoken text
+export function speakable(html, lang) { const d = document.createElement('div'); d.innerHTML = html; return textOf(d, lang); }
 export function pauseSpeaking() { S.gen++; S.playing = false; synth?.cancel(); renderBar(); }
 export function stopSpeaking() {
   S.gen++; S.playing = false; synth?.cancel(); clearInterval(S.keep);
